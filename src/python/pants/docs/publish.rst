@@ -435,8 +435,9 @@ respect several parameters:
 
  * ``extension`` -- the filename extension. Defaults to "jar".
 
-With the above config in your pants.ini, invoke pants like this, to do a test
-publish:
+**Note:** You must supply at least one of the above parameters, otherwise your extra publish
+artifact won't have a unique name. With the above config in your pants.ini, invoke pants like this,
+to do a test publish:
 
     yes|WRAPPER_SRCPATH=examples/src/python PANTS_DEV=1 ./pants goal publish examples/src/java/com/pants/examples/hello/greet --no-publish-dryrun --publish-local=~/tmp
 
@@ -448,5 +449,5 @@ been published for the ``greet`` target:
     hello-greet-extra_example-0.0.1-SNAPSHOT-classy.jar.md5
     hello-greet-extra_example-0.0.1-SNAPSHOT-classy.jar.sha1
 
-This example task should provide a rough starting guide, and can tailored to
+This example task should provide a rough starting guide, and can be tailored to
 suit a more specific situation.

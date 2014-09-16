@@ -584,16 +584,31 @@ class JarPublish(JarTask, ScmPublish):
       publish_extras = self.context.config.getdict(self._CONFIG_SECTION, 'publish_extras') or {}
       for extra_product in publish_extras:
         extra_config = publish_extras[extra_product]
-        override_name = None
+
+        if 'override_name' in extra_config or 'classifier' in extra_config or 'extension' in extra_config:
+          pass
+        else:
+          raise TaskError("publish_extra for '{0}' most override one of name, classifier, or "
+                          "extension to make a unique object.".format(extra_product))
+
+        override_name = jar.name
         if 'override_name' in extra_config:
           # If the supplied string has a '{target_provides_name}' in it, replace it with the
           # current jar name. If not, the string will be taken verbatim.
           override_name = extra_config['override_name'].format(target_provides_name=jar.name)
+
+
+        # FIXME(areitz): I've been using the classifier as a key into the ivy template. So, what
+        # happens if that isn't specified? Bad things, man.
+        #
+        # To fix, I could have a separate ivy_key, which could be the classifier if specified, or
+        # the extension if specified. But what if it's only the override_name? What is the key into
+        # the ivy config then? Maybe I'm allowing too much flexability here.
         classifier = extra_config['classifier'] if 'classifier' in extra_config else ''
         extension = extra_config['extension'] if 'extension' in extra_config else 'jar'
 
-        # Build a list of targets to check. This list will be the current target, plus the entire
-        # derived_from chain.
+        # Build a set of targets to check. This set will consist of the current target, plus the
+        # entire derived_from chain.
         target_set = set([tgt])
         target = tgt
         while target.derived_from != target:
