@@ -572,6 +572,10 @@ class JarPublish(JarTask, ScmPublish):
           shutil.copy(os.path.join(basedir, artifact), path)
 
     def stage_artifacts(tgt, jar, version, changelog):
+      DEFAULT_IVY_TYPE = 'jar'
+      DEFAULT_CLASSIFIER = ''
+      DEFAULT_EXTENSION = 'jar'
+
       copy_artifact(tgt, jar, version, typename='jars')
       self.create_source_jar(tgt, jar, version)
       doc_jar = self.create_doc_jar(tgt, jar, version)
@@ -585,6 +589,9 @@ class JarPublish(JarTask, ScmPublish):
       for extra_product in publish_extras:
         extra_config = publish_extras[extra_product]
 
+        # A lot of flexability is allowed, in naming the extra artifact. Because the name must be
+        # unique, some extra logic is required to ensure that the user supplied at least one
+        # non-default value (thus ensuring a uniquely-named artifact in the end).
         if 'override_name' in extra_config or 'classifier' in extra_config or 'extension' in extra_config:
           pass
         else:
@@ -597,15 +604,25 @@ class JarPublish(JarTask, ScmPublish):
           # current jar name. If not, the string will be taken verbatim.
           override_name = extra_config['override_name'].format(target_provides_name=jar.name)
 
+        classifier = DEFAULT_CLASSIFIER
+        suffix = ''
+        ivy_type = DEFAULT_IVY_TYPE
+        if 'classifier' in extra_config:
+          classifier = extra_config['classifier']
+          suffix = "-{0}".format(classifier)
+          ivy_type = classifier
 
-        # FIXME(areitz): I've been using the classifier as a key into the ivy template. So, what
-        # happens if that isn't specified? Bad things, man.
-        #
-        # To fix, I could have a separate ivy_key, which could be the classifier if specified, or
-        # the extension if specified. But what if it's only the override_name? What is the key into
-        # the ivy config then? Maybe I'm allowing too much flexability here.
-        classifier = extra_config['classifier'] if 'classifier' in extra_config else ''
-        extension = extra_config['extension'] if 'extension' in extra_config else 'jar'
+        extension = DEFAULT_EXTENSION
+        if 'extension' in extra_config:
+          extension = extra_config['extension']
+          if ivy_type == DEFAULT_IVY_TYPE:
+            ivy_type = extension
+
+        if override_name == jar.name and classifier == DEFAULT_CLASSIFIER and extension == DEFAULT_EXTENSION:
+          raise TaskError("publish_extra for '{0}' most override one of name, classifier or "
+                          "extension with a non-default value.".format(extra_product))
+
+        ivy_tmpl_key = "publish_extra-{0}{1}{2}".format(override_name, classifier, extension)
 
         # Build a set of targets to check. This set will consist of the current target, plus the
         # entire derived_from chain.
@@ -617,14 +634,14 @@ class JarPublish(JarTask, ScmPublish):
         for cur_tgt in target_set:
           if self.context.products.get(extra_product).has(cur_tgt):
             copy_artifact(cur_tgt, jar, version, typename=extra_product,
-                          suffix="-{0}".format(classifier), extension=extension,
+                          suffix=suffix, extension=extension,
                           override_name=override_name)
-            confs.add(classifier)
+            confs.add(ivy_tmpl_key)
             # Supply extra data about this jar into the Ivy template, so that Ivy will publish it
             # to the final destination.
             extra_confs.append({'name': override_name,
-                                'type': classifier,
-                                'conf': classifier,
+                                'type': ivy_type,
+                                'conf': ivy_tmpl_key,
                                 'classifier': classifier,
                                 'ext': extension})
 

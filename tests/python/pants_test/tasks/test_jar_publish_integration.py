@@ -12,12 +12,28 @@ from pants.util.contextutil import temporary_dir
 from pants_test.pants_run_integration_test import PantsRunIntegrationTest
 from pants_test.tasks.test_base import is_exe
 
-def shared_artifacts(version):
-  return {'com/pants/examples/hello-greet/{0}/'.format(version):
-          ['ivy-{0}.xml'.format(version),
+def shared_artifacts(version, extra_jar=None):
+  ary = ['ivy-{0}.xml'.format(version),
             'hello-greet-{0}.jar'.format(version),
             'hello-greet-{0}.pom'.format(version),
-            'hello-greet-{0}-sources.jar'.format(version)]}
+            'hello-greet-{0}-sources.jar'.format(version)]
+  if extra_jar:
+    ary.append(extra_jar)
+  return {'com/pants/examples/hello-greet/{0}/'.format(version): ary}
+
+def publish_extra_config(unique_config):
+  return {
+          'jar-publish': {
+            'publish_extras': {
+              'extra_test_jar_example': unique_config,
+              },
+            },
+          'backends': {
+            'packages': [
+              'example.pants_publish_plugin',
+              ],
+            },
+          }
 
 class JarPublishIntegrationTest(PantsRunIntegrationTest):
   SCALADOC = is_exe('scaladoc')
@@ -54,31 +70,56 @@ class JarPublishIntegrationTest(PantsRunIntegrationTest):
                       shared_artifacts(name),
                       extra_options=['--publish-named-snapshot=%s' % name])
 
-  def test_publish_extras(self):
+  # Collect all the common factors for running a publish_extras test, and execute the test.
+  def publish_extras_runner(self, extra_config=None, artifact_name=None):
     self.publish_test('examples/src/java/com/pants/examples/hello/greet',
-                      {'com/pants/examples/hello-greet/0.0.1-SNAPSHOT/':
-                        ['ivy-0.0.1-SNAPSHOT.xml',
-                         'hello-greet-0.0.1-SNAPSHOT.jar',
-                         'hello-greet-0.0.1-SNAPSHOT.pom',
-                         'hello-greet-0.0.1-SNAPSHOT-sources.jar',
-                         'hello-greet-extra_example-0.0.1-SNAPSHOT-classy.jar']},
+                      shared_artifacts('0.0.1-SNAPSHOT', artifact_name),
                       extra_options=['--doc-javadoc-skip'],
-                      extra_config={
-                        'jar-publish': {
-                          'publish_extras': {
-                            'extra_test_jar_example': {
-                              'override_name': '{target_provides_name}-extra_example',
-                              'classifier': 'classy',
-                              },
-                            },
-                          },
-                        'backends': {
-                          'packages': [
-                            'example.pants_publish_plugin',
-                            ],
-                          },
-                        },
+                      extra_config=extra_config,
                       extra_env={'WRAPPER_SRCPATH': 'examples/src/python'})
+
+
+  #
+  # Run through all the permutations of the config parameters for publish_extras.
+  #
+  def test_publish_extras_name_classifier(self):
+    self.publish_extras_runner(extra_config=publish_extra_config({
+                                'override_name': '{target_provides_name}-extra_example',
+                                'classifier': 'classy',
+                                }),
+                               artifact_name='hello-greet-extra_example-0.0.1-SNAPSHOT-classy.jar')
+
+  def test_publish_extras_name(self):
+    self.publish_extras_runner(extra_config=publish_extra_config({
+                                'override_name': '{target_provides_name}-extra_example',
+                                }),
+                               artifact_name='hello-greet-extra_example-0.0.1-SNAPSHOT.jar')
+
+  def test_publish_extras_name_extension(self):
+    self.publish_extras_runner(extra_config=publish_extra_config({
+                                'override_name': '{target_provides_name}-extra_example',
+                                'extension': 'zip'
+                                }),
+                               artifact_name='hello-greet-extra_example-0.0.1-SNAPSHOT.zip')
+
+  def test_publish_extras_extension(self):
+    self.publish_extras_runner(extra_config=publish_extra_config({
+                                'extension': 'zip'
+                                }),
+                               artifact_name='hello-greet-0.0.1-SNAPSHOT.zip')
+
+  def test_publish_extras_extension_classifier(self):
+    self.publish_extras_runner(extra_config=publish_extra_config({
+                                'classifier': 'classy',
+                                'extension': 'zip'
+                                }),
+                               artifact_name='hello-greet-0.0.1-SNAPSHOT-classy.zip')
+
+  def test_publish_extras_classifier(self):
+    self.publish_extras_runner(extra_config=publish_extra_config({
+                                'classifier': 'classy',
+                                }),
+                               artifact_name='hello-greet-0.0.1-SNAPSHOT-classy.jar')
 
 
   def publish_test(self, target, artifacts, extra_options=None, extra_config=None,

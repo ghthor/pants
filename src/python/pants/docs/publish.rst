@@ -435,9 +435,10 @@ respect several parameters:
 
  * ``extension`` -- the filename extension. Defaults to "jar".
 
-**Note:** You must supply at least one of the above parameters, otherwise your extra publish
-artifact won't have a unique name. With the above config in your pants.ini, invoke pants like this,
-to do a test publish:
+**Note:** You must supply a non-default value for at least one of the above
+parameters, otherwise your extra publish artifact won't have a unique name.
+With the above config in your pants.ini, invoke pants like this, to do a test
+publish:
 
     yes|WRAPPER_SRCPATH=examples/src/python PANTS_DEV=1 ./pants goal publish examples/src/java/com/pants/examples/hello/greet --no-publish-dryrun --publish-local=~/tmp
 
