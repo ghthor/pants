@@ -152,12 +152,23 @@ class JvmDependencyAnalyzer(object):
           return os.path.relpath(path, buildroot)
         return path
 
-      def filter_whitelisted(missing_deps):
+      def filter_tgt_deps_whitelisted(missing_deps):
         # Removing any targets that exist in the whitelist from the list of dependency issues.
-        return [(tgt_pair, evidence) for (tgt_pair, evidence) in missing_deps
-                            if tgt_pair[0].address.reference() not in self._target_whitelist]
+        return [
+          (tgt_pair, evidence)
+          for (tgt_pair, evidence) in missing_deps
+          if tgt_pair[0].address.reference() not in self._target_whitelist
+        ]
 
-      missing_tgt_deps = filter_whitelisted(missing_tgt_deps)
+      def filter_file_deps_whitelisted(missing_deps):
+        return [
+          (src_tgt, dep)
+          for (src_tgt, dep) in missing_deps
+          if src_tgt.address.reference() not in self._target_whitelist
+        ]
+
+      missing_tgt_deps = filter_tgt_deps_whitelisted(missing_tgt_deps)
+      missing_file_deps = filter_file_deps_whitelisted(missing_file_deps)
 
       if self._check_missing_deps and (missing_file_deps or missing_tgt_deps):
         for (tgt_pair, evidence) in missing_tgt_deps:
@@ -172,7 +183,7 @@ class JvmDependencyAnalyzer(object):
         if self._check_missing_deps == 'fatal':
           raise TaskError('Missing deps.')
 
-      missing_direct_tgt_deps = filter_whitelisted(missing_direct_tgt_deps)
+      missing_direct_tgt_deps = filter_tgt_deps_whitelisted(missing_direct_tgt_deps)
 
       if self._check_missing_direct_deps and missing_direct_tgt_deps:
 
