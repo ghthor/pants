@@ -90,7 +90,10 @@ class JvmDependencyAnalyzer(object):
 
         def get_transitive_jars_by_ref(ref1):
           def create_collection(current_ref):
-            return {ivyinfo.modules_by_ref[current_ref].artifact}
+            if current_ref in ivyinfo.modules_by_ref:
+              return set([ivyinfo.modules_by_ref[current_ref].artifact])
+            else:
+              return set()
           return ivyinfo.traverse_dependency_graph(ref1, create_collection, memo=deps_by_ref_memo)
 
         target_key = (ref.org, ref.name)
