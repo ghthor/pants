@@ -57,20 +57,6 @@ class ResolvedJarAwareTaskIdentityFingerprintStrategy(TaskIdentityFingerprintStr
     super(ResolvedJarAwareTaskIdentityFingerprintStrategy, self).__init__(task)
     self._compile_classpath = compile_classpath
 
-  def _build_hasher(self, target):
-    hasher = super(ResolvedJarAwareTaskIdentityFingerprintStrategy, self)._build_hasher(target)
-    if isinstance(target, JarLibrary):
-      # NB: Collects only the jars for the current jar_library, and hashes them to ensure that both
-      # the resolved coordinates, and the requested coordinates are used. This ensures that if a
-      # source file depends on a library with source compatible but binary incompatible signature
-      # changes between versions, that you won't get runtime errors due to using an artifact built
-      # against a binary incompatible version resolved for a previous compile.
-      classpath_entries = self._compile_classpath.get_artifact_classpath_entries_for_targets(
-        [target], transitive=False)
-      for _, entry in classpath_entries:
-        hasher.update(str(entry.coordinate))
-    return hasher
-
   def __hash__(self):
     return hash((type(self), self._task.fingerprint))
 
