@@ -15,9 +15,6 @@ jvm_binary(name = 'bundle-bin',
   source = 'BundleMain.java',
   main = 'org.pantsbuild.testproject.bundle.BundleMain',
   basename = 'bundle-example',
-  dependencies = [
-    '3rdparty:guava',
-  ]
 )
 
 # This should fail because the relpath is wrong

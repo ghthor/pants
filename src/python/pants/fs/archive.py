@@ -87,9 +87,7 @@ class ZipArchiver(Archiver):
   def create(self, basedir, outdir, name, prefix=None):
     zippath = os.path.join(outdir, '{}.zip'.format(name))
     with open_zip(zippath, 'w', compression=ZIP_DEFLATED) as zip:
-      # For symlinks, we want to archive the actual content of linked files but
-      # under the relpath derived from symlink.
-      for root, _, files in safe_walk(basedir, followlinks=True):
+      for root, _, files in safe_walk(basedir):
         root = ensure_text(root)
         for file in files:
           file = ensure_text(file)
