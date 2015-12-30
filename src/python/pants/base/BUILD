@@ -192,5 +192,6 @@ python_library(
     '3rdparty/python/twitter/commons:twitter.common.collections',
     '3rdparty/python/twitter/commons:twitter.common.dirutil',
     '3rdparty/python:six',
+    'src/python/pants/source',
   ],
 )
