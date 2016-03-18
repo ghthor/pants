@@ -343,7 +343,7 @@ class Parser(object):
   }
 
   _allowed_member_types = {
-    str, int, float, dict_option, file_option, target_option
+    str, int, float, tuple, dict_option, file_option, target_option
   }
 
   def _validate(self, args, kwargs):
