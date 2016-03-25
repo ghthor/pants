@@ -8,6 +8,7 @@ from __future__ import (absolute_import, division, generators, nested_scopes, pr
 import os.path
 from contextlib import contextmanager
 
+from fasteners import InterProcessLock
 from six import string_types
 from twitter.common.collections import maybe_list
 
@@ -45,7 +46,7 @@ class Ivy(object):
                          self._ivy_cache_dir, type(self._ivy_cache_dir)))
 
     self._extra_jvm_options = extra_jvm_options or []
-    self._lock = OwnerPrintingPIDLockFile(os.path.join(self._ivy_cache_dir, 'pants_ivy_lock'))
+    self._lock = InterProcessLock(os.path.join(self._ivy_cache_dir, 'pants_ivy_lock-flock'))
 
   @property
   def ivy_settings(self):
