@@ -66,10 +66,9 @@ class IvyResolveFingerprintStrategy(FingerprintStrategy):
 class IvyTaskMixin(TaskBase):
   """A mixin for Tasks that execute resolves via Ivy.
 
-  NB: Ivy reports are not relocatable in a cache, and a report must be present in order to
-  parse the graph structure of dependencies. Therefore, this mixin explicitly disables the
-  cache for its invalidation checks via the `use_cache=False` parameter. Tasks that extend
-  the mixin may safely enable task-level caching settings.
+  Must be mixed in to a task that registers a --jvm-options option (typically by
+  extending NailgunTask).
+  TODO: Get rid of this requirement by registering an --ivy-jvm-options below.
 
   :API: public
   """
