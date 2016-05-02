@@ -1,0 +1,65 @@
+
+python_library(
+  name = 'map_jvm_symbol_to_source_tree',
+  sources = ['map_jvm_symbol_to_source_tree.py', '__init__.py'],
+  dependencies = [
+    'contrib/buildgen/src/python/fsqio/contrib/buildgen/core:symbol_tree',
+    'src/python/pants/task',
+  ],
+)
+
+python_library(
+  name = 'map_java_exported_symbols',
+  sources = ['map_java_exported_symbols.py', '__init__.py'],
+  dependencies = [
+    'src/python/pants/backend/jvm/targets:java',
+    'src/python/pants/backend/jvm/targets:scala',
+    'src/python/pants/base:build_environment',
+    'src/python/pants/task',
+  ],
+)
+
+python_library(
+  name = 'map_third_party_jar_symbols',
+  sources = ['map_third_party_jar_symbols.py', '__init__.py'],
+  dependencies = [
+    'src/python/pants/backend/jvm/targets:jvm',
+    'src/python/pants/invalidation',
+    'src/python/pants/task',
+    'src/python/pants/util:dirutil',
+  ],
+)
+
+python_library(
+  name = 'scalac_buildgen_task_mixin',
+  sources = ['scalac_buildgen_task_mixin.py', '__init__.py'],
+  dependencies = [
+    'src/python/pants/backend/jvm/subsystems:scala_platform',
+    'src/python/pants/backend/jvm/tasks:jvm_tool_task_mixin',
+    'src/python/pants/base:build_environment',
+  ],
+)
+
+python_library(
+  name = 'third_party_map_jvm',
+  sources = ['third_party_map_jvm.py', '__init__.py'],
+  dependencies = [
+    'contrib/buildgen/src/python/fsqio/contrib/buildgen/core:third_party_map_util',
+  ],
+)
+
+python_library(
+  name = 'register',
+  sources = ['register.py', '__init__.py'],
+  dependencies = [
+    ':map_java_exported_symbols',
+    ':map_jvm_symbol_to_source_tree',
+    ':map_third_party_jar_symbols',
+    'contrib/buildgen/src/python/fsqio/contrib/buildgen/jvm/scala:buildgen_scala',
+    'contrib/buildgen/src/python/fsqio/contrib/buildgen/jvm/scala:map_scala_library_used_addresses',
+    'contrib/buildgen/src/python/fsqio/contrib/buildgen/jvm/scala:scala_exported_symbols',
+    'contrib/buildgen/src/python/fsqio/contrib/buildgen/jvm/scala:scala_used_symbols',
+    'src/python/pants/build_graph',
+    'src/python/pants/goal:task_registrar',
+  ],
+)

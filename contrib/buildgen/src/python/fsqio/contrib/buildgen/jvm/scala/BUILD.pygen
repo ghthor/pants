@@ -1,0 +1,48 @@
+
+python_library(
+  name = 'buildgen_scala',
+  sources = ['buildgen_scala.py', '__init__.py'],
+  dependencies = [
+    'contrib/buildgen/src/python/fsqio/contrib/buildgen/core:buildgen_task',
+    'src/python/pants/backend/jvm/targets:java',
+    'src/python/pants/backend/jvm/targets:scala',
+  ],
+)
+
+python_library(
+  name = 'map_scala_library_used_addresses',
+  sources = ['map_scala_library_used_addresses.py', '__init__.py'],
+  dependencies = [
+    'contrib/buildgen/src/python/fsqio/contrib/buildgen/core:buildgen_base',
+    'contrib/buildgen/src/python/fsqio/contrib/buildgen/core:third_party_map_util',
+    'contrib/buildgen/src/python/fsqio/contrib/buildgen/jvm:third_party_map_jvm',
+    'src/python/pants/backend/jvm/targets:java',
+    'src/python/pants/backend/jvm/targets:scala',
+    'src/python/pants/build_graph',
+    'src/python/pants/util:memo',
+  ],
+)
+
+python_library(
+  name = 'scala_exported_symbols',
+  sources = ['scala_exported_symbols.py', '__init__.py'],
+  dependencies = [
+    'contrib/buildgen/src/python/fsqio/contrib/buildgen/core:source_analysis_task',
+    'contrib/buildgen/src/python/fsqio/contrib/buildgen/jvm:scalac_buildgen_task_mixin',
+    'src/python/pants/backend/jvm/targets:java',
+    'src/python/pants/backend/jvm/targets:scala',
+    'src/python/pants/backend/jvm/tasks:nailgun_task',
+  ],
+)
+
+python_library(
+  name = 'scala_used_symbols',
+  sources = ['scala_used_symbols.py', '__init__.py'],
+  dependencies = [
+    'contrib/buildgen/src/python/fsqio/contrib/buildgen/core:source_analysis_task',
+    'contrib/buildgen/src/python/fsqio/contrib/buildgen/jvm:scalac_buildgen_task_mixin',
+    'src/python/pants/backend/jvm/targets:java',
+    'src/python/pants/backend/jvm/targets:scala',
+    'src/python/pants/backend/jvm/tasks:nailgun_task',
+  ],
+)
