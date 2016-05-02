@@ -2,8 +2,6 @@
 # Licensed under the Apache License, Version 2.0 (see LICENSE).
 
 
-# (mateo) Some implicit dependencies had to be forced for buildgen.
-# They are required by the extension loader but are being processed as strings.
 python_library(
   name='bin',
   sources=globs('*.py', exclude=['options_initializer.py',
@@ -16,12 +14,7 @@ python_library(
     'src/python/pants/backend/jvm/tasks:nailgun_task',
     '3rdparty/python:twitter.common.collections',
     ':plugins',
-    'src/python/pants/backend/codegen:plugin',                # Force dep for buildgen.
-    'src/python/pants/backend/docgen:plugin',                 # Force dep for buildgen.
-    'src/python/pants/backend/graph_info:plugin',             # Force dep for buildgen.
-    'src/python/pants/backend/jvm:plugin',                    # Force dep for buildgen.
     'src/python/pants/backend/python:python_setup',
-    'src/python/pants/backend/python:plugin',                 # Force dep for buildgen.
     'src/python/pants/base:build_environment',
     'src/python/pants/base:build_file',
     'src/python/pants/base:cmd_line_spec_parser',
@@ -111,6 +104,7 @@ target(
     'src/python/pants/backend/jvm:plugin',
     'src/python/pants/backend/project_info:plugin',
     'src/python/pants/backend/python:plugin',
+    'src/python/pants/core_tasks:core_tasks',
   ],
 )
 
