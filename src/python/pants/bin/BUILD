@@ -1,6 +1,9 @@
 # Copyright 2014 Pants project contributors (see CONTRIBUTORS.md).
 # Licensed under the Apache License, Version 2.0 (see LICENSE).
 
+
+# (mateo) Some implicit dependencies had to be forced for buildgen.
+# They are required by the extension loader but are being processed as strings.
 python_library(
   name='bin',
   sources=globs('*.py', exclude=['options_initializer.py',
@@ -11,6 +14,14 @@ python_library(
     '3rdparty/python:setproctitle',
     '3rdparty/python/twitter/commons:twitter.common.collections',
     'src/python/pants/backend/jvm/tasks:nailgun_task',
+    '3rdparty/python:twitter.common.collections',
+    ':plugins',
+    'src/python/pants/backend/codegen:plugin',                # Force dep for buildgen.
+    'src/python/pants/backend/docgen:plugin',                 # Force dep for buildgen.
+    'src/python/pants/backend/graph_info:plugin',             # Force dep for buildgen.
+    'src/python/pants/backend/jvm:plugin',                    # Force dep for buildgen.
+    'src/python/pants/backend/python:python_setup',
+    'src/python/pants/backend/python:plugin',                 # Force dep for buildgen.
     'src/python/pants/base:build_environment',
     'src/python/pants/base:build_file',
     'src/python/pants/base:cmd_line_spec_parser',
@@ -29,6 +40,8 @@ python_library(
     'src/python/pants/engine:storage',
     'src/python/pants/engine/legacy:graph',
     'src/python/pants/engine/legacy:parser',
+    'src/python/pants/core_tasks:core_tasks',                 # Force dep for buildgen.
+    'src/python/pants/engine',
     'src/python/pants/goal',
     'src/python/pants/goal:context',
     'src/python/pants/goal:run_tracker',
