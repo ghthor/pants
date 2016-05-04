@@ -108,16 +108,40 @@ function pkg_findbugs_install_test() {
   execute_packaged_pants_with_internal_backends \
       --plugins="['pantsbuild.pants.contrib.findbugs==$(local_version)']" \
       --explain compile | grep "findbugs" &> /dev/null
+
+PKG_BUILDGEN_CORE=(
+  "fsqio.pants.contrib.buildgen.core"
+  "//contrib/buildgen/src/python/pants/contrib/buildgen/core:plugin"
+)
+
+
+PKG_BUILDGEN_PYTHON=(
+  "fsqio.pants.contrib.buildgen.python"
+  "//contrib/buildgen/src/python/pants/contrib/buildgen/python:plugin"
+  "pkg_buildgen_python_install_test"
+)
+function pkg_buildgen_python_install_test() {
+  execute_packaged_pants_with_internal_backends \
+      --plugins="['fsqio.pants.contrib.buildgen.core==$(local_version)', \
+      'fsqio.pants.contrib.buildgen.python==$(local_version)' ]" \
+      t --explain buildgen | grep "BuildgenPython" &> /dev/null
+}
+
+PKG_BUILDGEN_JVM=(
+  "fsqio.pants.contrib.buildgen.jvm"
+  "//contrib/buildgen/src/python/pants/contrib/buildgen/jvm:plugin"
+  "pkg_buildgen_jvm_install_test"
+)
+function pkg_buildgen_jvm_install_test() {
+  execute_packaged_pants_with_internal_backends \
+      --plugins="['fsqio.pants.contrib.buildgen.core==$(local_version)', \
+      'fsqio.pants.contrib.buildgen.jvm==$(local_version)' ]" \
+      t --explain buildgen | grep "BuildgenScala" &> /dev/null
 }
 
 # Once individual (new) package is declared above, insert it into the array below)
 CONTRIB_PACKAGES=(
-  PKG_ANDROID
-  PKG_SCROOGE
-  PKG_BUILDGEN
-  PKG_GO
-  PKG_NODE
-  PKG_PYTHON_CHECKS
-  PKG_SCALAJS
-  PKG_FINDBUGS
+  PKG_BUILDGEN_CORE
+  PKG_BUILDGEN_PYTHON
+  PKG_BUILDGEN_JVM
 )

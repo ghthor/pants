@@ -19,11 +19,11 @@ from pants.backend.python.targets.python_tests import PythonTests
 from pants.build_graph.address import Address
 from pants.util.memo import memoized_property
 
-from fsqio.contrib.buildgen.core.buildgen_task import BuildgenTask
-from fsqio.contrib.buildgen.core.symbol_tree import SymbolTreeNode
-from fsqio.contrib.buildgen.core.third_party_map_util import check_manually_defined
-from fsqio.contrib.buildgen.python.python_import_parser import PythonImportParser
-from fsqio.contrib.buildgen.python.third_party_map_python import (
+from pants.contrib.buildgen.core.buildgen_task import BuildgenTask
+from pants.contrib.buildgen.core.symbol_tree import SymbolTreeNode
+from pants.contrib.buildgen.core.third_party_map_util import check_manually_defined
+from pants.contrib.buildgen.python.python_import_parser import PythonImportParser
+from pants.contrib.buildgen.python.third_party_map_python import (
   get_system_modules,
   python_third_party_map,
 )

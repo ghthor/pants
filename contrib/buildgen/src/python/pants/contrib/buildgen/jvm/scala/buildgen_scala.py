@@ -14,7 +14,7 @@ from __future__ import (
 from pants.backend.jvm.targets.java_tests import JavaTests
 from pants.backend.jvm.targets.scala_library import ScalaLibrary
 
-from fsqio.contrib.buildgen.core.buildgen_task import BuildgenTask
+from pants.contrib.buildgen.core.buildgen_task import BuildgenTask
 
 
 class BuildgenScala(BuildgenTask):

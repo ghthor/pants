@@ -13,9 +13,9 @@ from __future__ import (
 
 from pants.util.memo import memoized_property
 
-from fsqio.contrib.buildgen.core.build_file_manipulator import BuildFileManipulator
-from fsqio.contrib.buildgen.core.buildgen_base import BuildgenBase
-from fsqio.contrib.buildgen.core.subsystems.buildgen_subsystem import BuildgenSubsystem
+from pants.contrib.buildgen.core.build_file_manipulator import BuildFileManipulator
+from pants.contrib.buildgen.core.buildgen_base import BuildgenBase
+from pants.contrib.buildgen.core.subsystems.buildgen_subsystem import BuildgenSubsystem
 
 
 class BuildgenTask(BuildgenBase):

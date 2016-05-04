@@ -13,7 +13,7 @@ from __future__ import (
 
 from pants.task.task import Task
 
-from fsqio.contrib.buildgen.core.symbol_tree import SymbolTreeNode
+from pants.contrib.buildgen.core.symbol_tree import SymbolTreeNode
 
 
 class MapJvmSymbolToSourceTree(Task):

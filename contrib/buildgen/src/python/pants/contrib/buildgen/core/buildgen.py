@@ -15,7 +15,7 @@ from pants.base.build_environment import get_buildroot
 from pants.base.cmd_line_spec_parser import CmdLineSpecParser
 from pants.base.specs import DescendantAddresses
 
-from fsqio.contrib.buildgen.core.buildgen_task import BuildgenTask
+from pants.contrib.buildgen.core.buildgen_task import BuildgenTask
 
 
 class Buildgen(BuildgenTask):

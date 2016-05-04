@@ -3,7 +3,7 @@
 
 from __future__ import absolute_import
 
-from fsqio.contrib.buildgen.core.third_party_map_util import Default, Skip
+from pants.contrib.buildgen.core.third_party_map_util import Default, Skip
 
 
 # This non-exhaustive map covers many common package names imported via 3rdparty jars.

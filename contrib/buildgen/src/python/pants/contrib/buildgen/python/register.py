@@ -6,8 +6,8 @@ from __future__ import absolute_import
 from pants.build_graph.build_file_aliases import BuildFileAliases
 from pants.goal.task_registrar import TaskRegistrar as task
 
-from fsqio.contrib.buildgen.python.buildgen_python import BuildgenPython
-from fsqio.contrib.buildgen.python.map_python_exported_symbols import MapPythonExportedSymbols
+from pants.contrib.buildgen.python.buildgen_python import BuildgenPython
+from pants.contrib.buildgen.python.map_python_exported_symbols import MapPythonExportedSymbols
 
 
 def build_file_aliases():

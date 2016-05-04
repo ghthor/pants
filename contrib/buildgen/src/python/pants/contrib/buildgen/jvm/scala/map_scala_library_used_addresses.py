@@ -20,9 +20,9 @@ from pants.backend.jvm.targets.scala_library import ScalaLibrary
 from pants.build_graph.address import Address
 from pants.util.memo import memoized_property
 
-from fsqio.contrib.buildgen.core.buildgen_base import BuildgenBase
-from fsqio.contrib.buildgen.core.third_party_map_util import Skip, check_manually_defined
-from fsqio.contrib.buildgen.jvm.third_party_map_jvm import jvm_third_party_map
+from pants.contrib.buildgen.core.buildgen_base import BuildgenBase
+from pants.contrib.buildgen.core.third_party_map_util import Skip, check_manually_defined
+from pants.contrib.buildgen.jvm.third_party_map_jvm import jvm_third_party_map
 
 
 class MapScalaLibraryUsedAddresses(BuildgenBase):

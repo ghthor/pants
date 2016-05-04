@@ -15,8 +15,8 @@ from pants.base.exceptions import TaskError
 from pants.base.specs import DescendantAddresses
 from pants.build_graph.address import Address
 
-from fsqio.contrib.buildgen.core.buildgen_target_bag import BuildgenTargetBag
-from fsqio.contrib.buildgen.core.buildgen_task import BuildgenTask
+from pants.contrib.buildgen.core.buildgen_target_bag import BuildgenTargetBag
+from pants.contrib.buildgen.core.buildgen_task import BuildgenTask
 
 
 class BuildgenAggregateTargets(BuildgenTask):

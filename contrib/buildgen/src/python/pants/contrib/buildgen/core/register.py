@@ -6,12 +6,12 @@ from __future__ import absolute_import
 from pants.build_graph.build_file_aliases import BuildFileAliases
 from pants.goal.task_registrar import TaskRegistrar as task
 
-from fsqio.contrib.buildgen.core.buildgen import Buildgen
-from fsqio.contrib.buildgen.core.buildgen_aggregate_targets import BuildgenAggregateTargets
-from fsqio.contrib.buildgen.core.buildgen_target_bag import BuildgenTargetBag
-from fsqio.contrib.buildgen.core.buildgen_timestamp import BuildgenTimestamp
-from fsqio.contrib.buildgen.core.map_derived_targets import MapDerivedTargets
-from fsqio.contrib.buildgen.core.map_sources_to_addresses_mapper import MapSourcesToAddressesMapper
+from pants.contrib.buildgen.core.buildgen import Buildgen
+from pants.contrib.buildgen.core.buildgen_aggregate_targets import BuildgenAggregateTargets
+from pants.contrib.buildgen.core.buildgen_target_bag import BuildgenTargetBag
+from pants.contrib.buildgen.core.buildgen_timestamp import BuildgenTimestamp
+from pants.contrib.buildgen.core.map_derived_targets import MapDerivedTargets
+from pants.contrib.buildgen.core.map_sources_to_addresses_mapper import MapSourcesToAddressesMapper
 
 
 def build_file_aliases():

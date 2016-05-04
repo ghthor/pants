@@ -5,9 +5,9 @@ python_library(
   dependencies = [
     ':python_import_parser',
     ':third_party_map_python',
-    'contrib/buildgen/src/python/fsqio/contrib/buildgen/core:buildgen_task',
-    'contrib/buildgen/src/python/fsqio/contrib/buildgen/core:symbol_tree',
-    'contrib/buildgen/src/python/fsqio/contrib/buildgen/core:third_party_map_util',
+    'contrib/buildgen/src/python/pants/contrib/buildgen/core:buildgen_task',
+    'contrib/buildgen/src/python/pants/contrib/buildgen/core:symbol_tree',
+    'contrib/buildgen/src/python/pants/contrib/buildgen/core:third_party_map_util',
     'src/python/pants/backend/python/targets:python',
     'src/python/pants/build_graph',
     'src/python/pants/util:memo',

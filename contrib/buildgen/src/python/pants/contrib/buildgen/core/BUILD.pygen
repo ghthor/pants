@@ -36,7 +36,7 @@ python_library(
   name = 'buildgen_base',
   sources = ['buildgen_base.py', '__init__.py'],
   dependencies = [
-    'contrib/buildgen/src/python/fsqio/contrib/buildgen/core/subsystems:buildgen_subsystem',
+    'contrib/buildgen/src/python/pants/contrib/buildgen/core/subsystems:buildgen_subsystem',
     'src/python/pants/task',
     'src/python/pants/util:memo',
   ],
@@ -56,7 +56,7 @@ python_library(
   dependencies = [
     ':build_file_manipulator',
     ':buildgen_base',
-    'contrib/buildgen/src/python/fsqio/contrib/buildgen/core/subsystems:buildgen_subsystem',
+    'contrib/buildgen/src/python/pants/contrib/buildgen/core/subsystems:buildgen_subsystem',
     'src/python/pants/util:memo',
   ],
 )
