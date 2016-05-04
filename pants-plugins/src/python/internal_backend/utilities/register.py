@@ -34,9 +34,6 @@ def pants_setup_py(name, description, additional_classifiers=None, **kwargs):
                  <https://pythonhosted.org/setuptools/setuptools.html>`_.
   :returns: A setup_py suitable for building and publishing pants components.
   """
-  if not name.startswith('pantsbuild.pants'):
-    raise ValueError("Pants distribution package names must start with 'pantsbuild.pants', "
-                     "given {}".format(name))
 
   standard_classifiers = [
       'Intended Audience :: Developers',
@@ -56,8 +53,7 @@ def pants_setup_py(name, description, additional_classifiers=None, **kwargs):
       name=name,
       version=VERSION,
       description=description,
-      long_description=(_read_contents('src/python/pants/ABOUT.rst') + notes),
-      url='https://github.com/pantsbuild/pants',
+      url='https://github.com/foursquare/fsqio',
       license='Apache License, Version 2.0',
       zip_safe=True,
       classifiers=list(classifiers),
@@ -75,9 +71,6 @@ def contrib_setup_py(name, description, additional_classifiers=None, **kwargs):
                  <https://pythonhosted.org/setuptools/setuptools.html>`_.
   :returns: A setup_py suitable for building and publishing pants components.
   """
-  if not name.startswith('pantsbuild.pants.contrib.'):
-    raise ValueError("Contrib plugin package names must start with 'pantsbuild.pants.contrib.', "
-                     "given {}".format(name))
 
   return pants_setup_py(name,
                         description,
@@ -168,9 +161,6 @@ class PantsPlugin(PythonLibrary):
     :param bool register_goals: If `True`, register.py:register_goals must be defined and
                                 registers the 'register_goals' 'pantsbuild.plugin' entrypoint.
     """
-    if not distribution_name.startswith('pantsbuild.pants.'):
-      raise ValueError("Pants plugin package distribution names must start with "
-                       "'pantsbuild.pants.', given {}".format(distribution_name))
 
     if not os.path.exists(os.path.join(get_buildroot(), address.spec_path, 'register.py')):
       raise TargetDefinitionException(address.spec_path,

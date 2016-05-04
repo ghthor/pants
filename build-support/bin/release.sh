@@ -54,7 +54,6 @@ function pkg_pants_testinfra_install_test() {
 # Once an individual (new) package is declared above, insert it into the array below)
 RELEASE_PACKAGES=(
   PKG_PANTS
-  PKG_PANTS_TESTINFRA
   ${CONTRIB_PACKAGES[*]}
 )
 #
