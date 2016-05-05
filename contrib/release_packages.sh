@@ -108,11 +108,18 @@ function pkg_findbugs_install_test() {
   execute_packaged_pants_with_internal_backends \
       --plugins="['pantsbuild.pants.contrib.findbugs==$(local_version)']" \
       --explain compile | grep "findbugs" &> /dev/null
+}
 
 PKG_BUILDGEN_CORE=(
   "fsqio.pants.contrib.buildgen.core"
   "//contrib/buildgen/src/python/pants/contrib/buildgen/core:plugin"
+  "pkg_buildgen_core_install_test"
 )
+function pkg_buildgen_core_install_test() {
+  execute_packaged_pants_with_internal_backends \
+      --plugins="['fsqio.pants.contrib.buildgen.core==$(local_version)',]" \
+      --explain buildgen | grep "Buildgen" &> /dev/null
+}
 
 
 PKG_BUILDGEN_PYTHON=(

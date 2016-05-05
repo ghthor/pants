@@ -54,6 +54,7 @@ def pants_setup_py(name, description, additional_classifiers=None, **kwargs):
       version=VERSION,
       description=description,
       url='https://github.com/foursquare/fsqio',
+      long_description=None,
       license='Apache License, Version 2.0',
       zip_safe=True,
       classifiers=list(classifiers),
