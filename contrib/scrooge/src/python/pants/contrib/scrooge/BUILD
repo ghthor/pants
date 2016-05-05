@@ -4,7 +4,8 @@
 contrib_plugin(
   name='plugin',
   dependencies=[
-    'contrib/scrooge/src/python/pants/contrib/scrooge/tasks',
+    'contrib/scrooge/src/python/pants/contrib/scrooge/tasks:scrooge_gen',
+     'contrib/scrooge/src/python/pants/contrib/scrooge/tasks:thrift_linter',
     'src/python/pants/goal:task_registrar',
   ],
   distribution_name='pantsbuild.pants.contrib.scrooge',
