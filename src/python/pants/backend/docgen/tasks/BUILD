@@ -12,6 +12,7 @@ python_library(
     '3rdparty/python:Markdown',
     '3rdparty/python:Pygments',
     '3rdparty/python:docutils',
+    '3rdparty/python:setuptools',
     '3rdparty/python:six',
     '3rdparty/python/twitter/commons:twitter.common.confluence',
     'src/python/pants/backend/docgen/targets',

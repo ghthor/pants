@@ -3,11 +3,11 @@
 
 python_library(
   name = 'subsystems',
+  sources = globs('*.py'),
   dependencies = [
     'contrib/node/src/python/pants/contrib/node/subsystems/resolvers:node_resolver_base',
     'src/python/pants/option',
     'src/python/pants/subsystem',
     'src/python/pants/util:dirutil',
   ],
-  sources = globs('*.py'),
 )

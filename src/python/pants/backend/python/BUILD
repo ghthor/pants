@@ -46,7 +46,6 @@ python_library(
   dependencies = [
     '3rdparty/python:pex',
     '3rdparty/python:setuptools',
-    'src/python/pants/option',
     'src/python/pants/subsystem',
   ]
 )
@@ -123,6 +122,9 @@ python_library(
 python_library(
   name = 'python_requirement',
   sources = ['python_requirement.py'],
+  dependencies = [
+    '3rdparty/python:setuptools',
+  ],
 )
 
 python_library(

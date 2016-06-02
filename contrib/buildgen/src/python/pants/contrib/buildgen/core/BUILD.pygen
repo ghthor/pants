@@ -56,7 +56,7 @@ python_library(
   dependencies = [
     ':build_file_manipulator',
     ':buildgen_base',
-    'contrib/buildgen/src/python/pants/contrib/buildgen/core/subsystems:buildgen_subsystem',
+    ':third_party_map_util',
     'src/python/pants/util:memo',
   ],
 )
@@ -79,8 +79,8 @@ python_library(
 )
 
 python_library(
-  name = 'map_sources_to_addresses_mapper',
-  sources = ['map_sources_to_addresses_mapper.py', '__init__.py'],
+  name = 'map_sources_to_addresses',
+  sources = ['map_sources_to_addresses.py', '__init__.py'],
   dependencies = [
     'src/python/pants/build_graph',
     'src/python/pants/task',

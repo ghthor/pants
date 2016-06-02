@@ -18,6 +18,7 @@ python_library(
     'contrib/buildgen/src/python/pants/contrib/buildgen/jvm:third_party_map_jvm',
     'src/python/pants/backend/jvm/targets:java',
     'src/python/pants/backend/jvm/targets:scala',
+    'src/python/pants/base:exceptions',
     'src/python/pants/build_graph',
     'src/python/pants/util:memo',
   ],

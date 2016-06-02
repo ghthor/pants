@@ -7,6 +7,7 @@ python_library(
   resource_targets=[':templates',],
   dependencies=[
     '3rdparty/python:ansicolors',
+    '3rdparty/python:setuptools',
     'src/python/pants/base:exceptions',
     'src/python/pants/base:generator',
     'src/python/pants/base:payload_field',

@@ -11,7 +11,7 @@ contrib_plugin(
     'contrib/buildgen/src/python/pants/contrib/buildgen/core:buildgen_task',
     'contrib/buildgen/src/python/pants/contrib/buildgen/core:buildgen_timestamp',
     'contrib/buildgen/src/python/pants/contrib/buildgen/core:map_derived_targets',
-    'contrib/buildgen/src/python/pants/contrib/buildgen/core:map_sources_to_addresses_mapper',
+    'contrib/buildgen/src/python/pants/contrib/buildgen/core:map_sources_to_addresses',
     'contrib/buildgen/src/python/pants/contrib/buildgen/core:source_analysis_task',
     'contrib/buildgen/src/python/pants/contrib/buildgen/core:symbol_tree',
     'contrib/buildgen/src/python/pants/contrib/buildgen/core:third_party_map_util',

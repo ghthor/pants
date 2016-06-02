@@ -24,6 +24,7 @@ python_tests(
   name = 'extension_loader',
   sources = ['test_extension_loader.py'],
   dependencies = [
+    '3rdparty/python:setuptools',
     'src/python/pants/base:exceptions',
     'src/python/pants/bin:bin',
     'src/python/pants/build_graph',
@@ -49,6 +50,7 @@ python_tests(
   sources=['test_plugin_resolver.py'],
   dependencies=[
     '3rdparty/python:pex',
+    '3rdparty/python:pytest',
     '3rdparty/python:setuptools',
     'src/python/pants/bin',
     'src/python/pants/option',

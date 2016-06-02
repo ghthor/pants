@@ -3,6 +3,7 @@
 
 python_library(
   name = 'targets',
+  sources = globs('*.py'),
   dependencies = [
     'contrib/node/src/python/pants/contrib/node/targets:node_module',
     'contrib/scalajs/src/python/pants/contrib/scalajs/subsystems',
@@ -12,5 +13,4 @@ python_library(
     'src/python/pants/base:payload_field',
     'src/python/pants/build_graph',
   ],
-  sources = globs('*.py'),
 )

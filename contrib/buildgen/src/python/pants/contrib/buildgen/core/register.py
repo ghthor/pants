@@ -11,7 +11,7 @@ from pants.contrib.buildgen.core.buildgen_aggregate_targets import BuildgenAggre
 from pants.contrib.buildgen.core.buildgen_target_bag import BuildgenTargetBag
 from pants.contrib.buildgen.core.buildgen_timestamp import BuildgenTimestamp
 from pants.contrib.buildgen.core.map_derived_targets import MapDerivedTargets
-from pants.contrib.buildgen.core.map_sources_to_addresses_mapper import MapSourcesToAddressesMapper
+from pants.contrib.buildgen.core.map_sources_to_addresses import MapSourcesToAddresses
 
 
 def build_file_aliases():
@@ -30,7 +30,7 @@ def register_goals():
 
   task(
     name='map-sources-to-addresses-mapper',
-    action=MapSourcesToAddressesMapper,
+    action=MapSourcesToAddresses,
   ).install()
 
   task(
