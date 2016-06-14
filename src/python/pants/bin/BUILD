@@ -7,90 +7,94 @@ python_library(
   sources=globs('*.py', exclude=['options_initializer.py',
                                  'extension_loader.py',
                                  'plugin_resolver.py']),
-  dependencies=[
+  dependencies = [
     '3rdparty/python:ansicolors',
     '3rdparty/python:setproctitle',
     '3rdparty/python:twitter.common.collections',
-    ':plugins',
-    'src/python/pants/backend/python:python_setup',
+    ':options_initializer',
     'src/python/pants/base:build_environment',
-    'src/python/pants/base:build_file',
     'src/python/pants/base:cmd_line_spec_parser',
     'src/python/pants/base:file_system_project_tree',
     'src/python/pants/base:scm_project_tree',
     'src/python/pants/base:workunit',
     'src/python/pants/build_graph',
-    'src/python/pants/core_tasks',
-    'src/python/pants/engine:legacy_engine',
-    'src/python/pants/engine:engine',
+
+    'src/python/pants/core_tasks:core_tasks',  # Force dep for buildgen.
+    'src/python/pants/engine',
+    'src/python/pants/engine/legacy:graph',
+    'src/python/pants/engine/legacy:parser',
+    'src/python/pants/engine/legacy:structs',
     'src/python/pants/engine:fs',
     'src/python/pants/engine:graph',
+    'src/python/pants/engine:legacy_engine',
     'src/python/pants/engine:mapper',
     'src/python/pants/engine:parser',
     'src/python/pants/engine:scheduler',
     'src/python/pants/engine:storage',
-    'src/python/pants/engine/legacy:graph',
-    'src/python/pants/engine/legacy:parser',
-    'src/python/pants/core_tasks:core_tasks',                 # Force dep for buildgen.
-    'src/python/pants/engine',
     'src/python/pants/goal',
     'src/python/pants/goal:context',
     'src/python/pants/goal:run_tracker',
     'src/python/pants/help',
+    'src/python/pants/java:nailgun_client',
+    'src/python/pants/java:nailgun_executor',
+    'src/python/pants/java:nailgun_io',
+    'src/python/pants/java:nailgun_protocol',
     'src/python/pants/option',
     'src/python/pants/pantsd/subsystem:pants_daemon_launcher',
+    'src/python/pants/pantsd:process_manager',
+    'src/python/pants/pantsd:util',
     'src/python/pants/reporting',
+    'src/python/pants/reporting:report',
+    'src/python/pants/source',
     'src/python/pants/subsystem',
     'src/python/pants/task',
     'src/python/pants/util:contextutil',
     'src/python/pants/util:dirutil',
     'src/python/pants/util:filtering',
     'src/python/pants/util:memo',
-    ':options_initializer',
   ],
 )
 
 python_library(
   name='extension_loader',
   sources=['extension_loader.py'],
-  dependencies=[
+  dependencies = [
     '3rdparty/python:setuptools',
-    '3rdparty/python/twitter/commons:twitter.common.collections',
-    'src/python/pants/base:exceptions',
-    'src/python/pants/build_graph:build_graph',
+    '3rdparty/python:twitter.common.collections',
     ':plugins',
-  ]
+    'src/python/pants/base:exceptions',
+    'src/python/pants/build_graph',
+  ],
 )
 
 python_library(
   name='plugin_resolver',
   sources=['plugin_resolver.py'],
-  dependencies=[
+  dependencies = [
     '3rdparty/python:pex',
     '3rdparty/python:setuptools',
     'src/python/pants/backend/python:python_setup',
-    'src/python/pants/option:option',
-    'src/python/pants/subsystem:subsystem',
+    'src/python/pants/option',
+    'src/python/pants/subsystem',
     'src/python/pants/util:dirutil',
     'src/python/pants/util:memo',
-  ]
+  ],
 )
 
 python_library(
   name='options_initializer',
   sources=['options_initializer.py'],
-  dependencies=[
+  dependencies = [
     '3rdparty/python:setuptools',
-    'src/python/pants/base:build_environment',
-    'src/python/pants/base:deprecated',
-    'src/python/pants/base:exceptions',
-    'src/python/pants/goal:goal',
-    'src/python/pants/logging:logging',
-    'src/python/pants/option:option',
-    'src/python/pants/subsystem:subsystem',
     ':extension_loader',
     ':plugin_resolver',
-  ]
+    'src/python/pants/base:build_environment',
+    'src/python/pants/base:exceptions',
+    'src/python/pants/goal',
+    'src/python/pants/logging',
+    'src/python/pants/option',
+    'src/python/pants/subsystem',
+  ],
 )
 
 target(

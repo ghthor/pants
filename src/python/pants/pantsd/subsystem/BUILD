@@ -5,9 +5,8 @@ python_library(
   name = 'subprocess',
   sources = ['subprocess.py'],
   dependencies = [
-    'src/python/pants/option',
     'src/python/pants/subsystem',
-  ]
+  ],
 )
 
 python_library(
@@ -17,9 +16,9 @@ python_library(
     ':subprocess',
     'src/python/pants/binaries:binary_util',
     'src/python/pants/pantsd:watchman',
-    'src/python/pants/subsystem:subsystem',
+    'src/python/pants/subsystem',
     'src/python/pants/util:memo',
-  ]
+  ],
 )
 
 python_library(
@@ -34,7 +33,7 @@ python_library(
     'src/python/pants/pantsd/service:scheduler_service',
     'src/python/pants/pantsd:pants_daemon',
     'src/python/pants/process',
-    'src/python/pants/subsystem:subsystem',
+    'src/python/pants/subsystem',
     'src/python/pants/util:memo',
-  ]
+  ],
 )

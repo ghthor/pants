@@ -8,7 +8,7 @@ python_library(
     'src/python/pants/goal',
     'src/python/pants/goal:task_registrar',
     'tests/python/pants_test:base_test',
-  ]
+  ],
 )
 
 python_tests(
@@ -18,7 +18,6 @@ python_tests(
     ':engine_test_base',
     'src/python/pants/base:exceptions',
     'src/python/pants/engine:legacy_engine',
-    'tests/python/pants_test/base:context_utils',
   ],
 )
 
@@ -36,130 +35,151 @@ python_tests(
 python_tests(
   name='addressable',
   sources=['test_addressable.py'],
-  dependencies=[
+  dependencies = [
     'src/python/pants/engine:addressable',
-  ]
+    'src/python/pants/engine:objects',
+  ],
 )
 
 python_tests(
   name='fs',
   sources=['test_fs.py'],
-  dependencies=[
+  dependencies = [
     ':scheduler_test_base',
+    'src/python/pants/base:project_tree',
+    'src/python/pants/base:scm_project_tree',
     'src/python/pants/engine:fs',
     'src/python/pants/engine:nodes',
+    'src/python/pants/util:meta',
     'tests/python/pants_test/testutils:git_util',
-  ]
+  ],
 )
 
 python_tests(
   name='path_globs',
   sources=['test_path_globs.py'],
-  dependencies=[
+  dependencies = [
     'src/python/pants/base:project_tree',
     'src/python/pants/engine:fs',
-  ]
+  ],
 )
 
 python_tests(
   name='struct',
   sources=['test_struct.py'],
-  dependencies=[
+  dependencies = [
     'src/python/pants/build_graph',
     'src/python/pants/engine:objects',
     'src/python/pants/engine:struct',
-  ]
+  ],
 )
 
 python_tests(
   name='engine',
   sources=['test_engine.py'],
-  dependencies=[
-    'src/python/pants/base:cmd_line_spec_parser',
+  dependencies = [
     'src/python/pants/build_graph',
+    'src/python/pants/engine',
+    'src/python/pants/engine:nodes',
+    'src/python/pants/engine:storage',
     'tests/python/pants_test/engine/examples:planners',
-    'src/python/pants/engine:engine',
-    'src/python/pants/engine:scheduler',
-  ]
+  ],
 )
 
 python_tests(
   name='graph',
   sources=['test_graph.py'],
-  dependencies=[
+  dependencies = [
     ':scheduler_test_base',
     'src/python/pants/build_graph',
-    'src/python/pants/engine:engine',
+    'src/python/pants/engine',
+    'src/python/pants/engine:addressable',
     'src/python/pants/engine:graph',
     'src/python/pants/engine:mapper',
+    'src/python/pants/engine:nodes',
     'src/python/pants/engine:parser',
-    'src/python/pants/engine:storage',
     'src/python/pants/engine:struct',
     'tests/python/pants_test/engine/examples:parsers',
-  ]
+  ],
 )
 
 python_tests(
   name='mapper',
   sources=['test_mapper.py'],
-  dependencies=[
+  dependencies = [
+    '3rdparty/python:pytest',
     ':scheduler_test_base',
+    'src/python/pants/base:specs',
     'src/python/pants/build_graph',
-    'tests/python/pants_test/engine/examples:parsers',
+    'src/python/pants/engine',
+    'src/python/pants/engine:addressable',
+    'src/python/pants/engine:graph',
     'src/python/pants/engine:mapper',
-    'src/python/pants/engine:storage',
+    'src/python/pants/engine:nodes',
+    'src/python/pants/engine:parser',
     'src/python/pants/engine:struct',
     'src/python/pants/util:dirutil',
-  ]
+    'tests/python/pants_test/engine/examples:parsers',
+  ],
 )
 
 python_tests(
   name='parsers',
   sources=['test_parsers.py'],
-  dependencies=[
-    'tests/python/pants_test/engine/examples:parsers',
+  dependencies = [
     'src/python/pants/engine:objects',
-  ]
+    'src/python/pants/engine:parser',
+    'tests/python/pants_test/engine/examples:parsers',
+  ],
 )
 
 python_tests(
   name='storage',
   sources=['test_storage.py'],
-  dependencies=[
+  dependencies = [
+    'src/python/pants/engine:fs',
+    'src/python/pants/engine:scheduler',
     'src/python/pants/engine:storage',
-  ]
+  ],
 )
 
 python_tests(
   name='scheduler',
   sources=['test_scheduler.py'],
   coverage=['pants.engine.nodes', 'pants.engine.scheduler'],
-  dependencies=[
+  dependencies = [
+    'src/python/pants/base:cmd_line_spec_parser',
     'src/python/pants/build_graph',
-    'tests/python/pants_test/engine/examples:planners',
-    'src/python/pants/engine:engine',
+    'src/python/pants/engine',
+    'src/python/pants/engine:addressable',
+    'src/python/pants/engine:nodes',
     'src/python/pants/engine:scheduler',
-  ]
+    'src/python/pants/util:contextutil',
+    'tests/python/pants_test/engine/examples:planners',
+  ],
 )
 
 python_tests(
   name='scheduler_test_base',
   sources=['scheduler_test_base.py'],
-  dependencies=[
+  dependencies = [
     'src/python/pants/base:file_system_project_tree',
+    'src/python/pants/engine',
     'src/python/pants/engine:fs',
+    'src/python/pants/engine:nodes',
     'src/python/pants/engine:parser',
     'src/python/pants/engine:scheduler',
-    'src/python/pants/engine:storage',
+    'src/python/pants/util:contextutil',
     'src/python/pants/util:dirutil',
-  ]
+  ],
 )
 
 python_tests(
   name='graph_validator',
   sources=['test_graph_validator.py'],
   coverage=['pants.engine.nodes', 'pants.engine.scheduler'],
-  dependencies=[
+  dependencies = [
     ':scheduler',
-  ]
+    'tests/python/pants_test/engine/examples:graph_validator',
+  ],
 )

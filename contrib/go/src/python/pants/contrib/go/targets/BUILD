@@ -12,7 +12,7 @@ target(
 python_library(
   name='go_binary',
   sources=['go_binary.py'],
-  dependencies=[
+  dependencies = [
     ':go_local_source',
   ],
 )
@@ -20,7 +20,7 @@ python_library(
 python_library(
   name='go_library',
   sources=['go_library.py'],
-  dependencies=[
+  dependencies = [
     ':go_local_source',
   ],
 )
@@ -28,11 +28,12 @@ python_library(
 python_library(
   name='go_local_source',
   sources=['go_local_source.py'],
-  dependencies=[
+  dependencies = [
     ':go_target',
-    'src/python/pants/base:build_environment',
+    'src/python/pants/base:exceptions',
     'src/python/pants/base:parse_context',
     'src/python/pants/base:payload',
+    'src/python/pants/build_graph',
     'src/python/pants/source',
   ],
 )
@@ -40,29 +41,30 @@ python_library(
 python_library(
   name='go_remote_library',
   sources=['go_remote_library.py'],
-  dependencies=[
+  dependencies = [
     ':go_target',
     'src/python/pants/base:exceptions',
     'src/python/pants/base:payload',
     'src/python/pants/base:payload_field',
+    'src/python/pants/build_graph',
   ],
 )
 
 python_library(
   name='go_target',
   sources=['go_target.py'],
-  dependencies=[
-    'src/python/pants/build_graph'
-  ]
+  dependencies = [
+    'src/python/pants/build_graph',
+  ],
 )
 
 python_library(
   name='go_thrift_library',
   sources=['go_thrift_library.py'],
-  dependencies=[
+  dependencies = [
     ':go_local_source',
-    'src/python/pants/base:parse_context',
+    ':go_target',
     'src/python/pants/base:payload',
     'src/python/pants/build_graph',
-  ]
+  ],
 )

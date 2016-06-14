@@ -9,68 +9,69 @@ page(
 python_library(
   name='parsers',
   sources=['parsers.py'],
-  dependencies=[
+  dependencies = [
     '3rdparty/python:six',
     'src/python/pants/build_graph',
     'src/python/pants/engine:objects',
     'src/python/pants/engine:parser',
     'src/python/pants/util:memo',
-  ]
+  ],
 )
 
 python_library(
   name='planners',
   sources=['planners.py'],
-  dependencies=[
+  dependencies = [
     ':graph_validator',
     ':parsers',
     ':sources',
     'src/python/pants/base:exceptions',
     'src/python/pants/base:file_system_project_tree',
     'src/python/pants/build_graph',
+    'src/python/pants/engine:addressable',
     'src/python/pants/engine:fs',
     'src/python/pants/engine:graph',
     'src/python/pants/engine:mapper',
-    'src/python/pants/engine:nodes',
     'src/python/pants/engine:parser',
     'src/python/pants/engine:scheduler',
     'src/python/pants/engine:selectors',
-    'src/python/pants/engine:storage',
     'src/python/pants/engine:struct',
-  ]
+    'src/python/pants/util:meta',
+    'src/python/pants/util:objects',
+  ],
 )
 
 python_library(
   name='graph_validator',
   sources=['graph_validator.py'],
-  dependencies=[
+  dependencies = [
     'src/python/pants/engine:nodes',
-  ]
+  ],
 )
 
 python_library(
   name='sources',
   sources=['sources.py'],
-  dependencies=[
+  dependencies = [
     'src/python/pants/engine:addressable',
     'src/python/pants/engine:fs',
+    'src/python/pants/engine:objects',
     'src/python/pants/engine:struct',
-    'src/python/pants/source',
-  ]
+  ],
 )
 
 python_library(
   name='visualizer',
   sources=['visualizer.py'],
-  dependencies=[
+  dependencies = [
     ':planners',
     'src/python/pants/base:cmd_line_spec_parser',
     'src/python/pants/binaries:binary_util',
-    'src/python/pants/build_graph',
-    'src/python/pants/engine:engine',
-    'src/python/pants/engine:scheduler',
+    'src/python/pants/engine',
+    'src/python/pants/engine:fs',
+    'src/python/pants/engine:storage',
     'src/python/pants/util:contextutil',
-  ]
+  ],
 )
 
 python_binary(

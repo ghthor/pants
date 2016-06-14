@@ -38,7 +38,7 @@ python_library(
     'src/python/pants/util:dirutil',
     'tests/python/pants_test/base:context_utils',
     'tests/python/pants_test/option/util',
-  ]
+  ],
 )
 
 python_library(
@@ -54,7 +54,7 @@ python_library(
     'src/python/pants/util:contextutil',
     'src/python/pants/util:dirutil',
     'tests/python/pants_test/testutils:file_test_util',
-  ]
+  ],
 )
 
 python_tests(
@@ -62,8 +62,9 @@ python_tests(
   sources = ['test_maven_layout.py'],
   dependencies = [
     ':base_test',
+    'src/python/pants/backend/jvm/targets:java',
     'src/python/pants/build_graph',
     'src/python/pants/source',
     'tests/python/pants_test/subsystem:subsystem_utils',
-  ]
+  ],
 )

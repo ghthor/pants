@@ -4,9 +4,6 @@
 
 python_library(
   name = 'all',
-  dependencies = [
-    ':android',
-  ],
 )
 
 python_library(
@@ -19,14 +16,11 @@ python_library(
     'android_target.py',
   ],
   dependencies = [
-    'contrib/android/src/python/pants/contrib/android:android_config_util',
     'contrib/android/src/python/pants/contrib/android:android_manifest_parser',
     'src/python/pants/backend/jvm/targets:jvm',
-    'src/python/pants/base:build_environment',
     'src/python/pants/base:exceptions',
     'src/python/pants/base:payload',
     'src/python/pants/base:payload_field',
-    'src/python/pants/build_graph',
     'src/python/pants/util:memo',
   ],
 )

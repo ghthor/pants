@@ -1,86 +1,84 @@
 python_tests(
   name='go_binary_create',
   sources=['test_go_binary_create.py'],
-  dependencies=[
+  dependencies = [
     'contrib/go/src/python/pants/contrib/go/targets:go_binary',
     'contrib/go/src/python/pants/contrib/go/tasks:go_binary_create',
     'src/python/pants/build_graph',
     'src/python/pants/util:contextutil',
     'src/python/pants/util:dirutil',
     'tests/python/pants_test/tasks:task_test_base',
-  ]
+  ],
 )
 
 python_tests(
   name='go_buildgen',
   sources=['test_go_buildgen.py'],
-  dependencies=[
+  dependencies = [
     'contrib/go/src/python/pants/contrib/go/subsystems',
     'contrib/go/src/python/pants/contrib/go/targets:go_binary',
     'contrib/go/src/python/pants/contrib/go/targets:go_library',
     'contrib/go/src/python/pants/contrib/go/targets:go_remote_library',
     'contrib/go/src/python/pants/contrib/go/tasks:go_buildgen',
     'contrib/go/src/python/pants/contrib/go:plugin',
-    'src/python/pants/base:exceptions',
     'src/python/pants/build_graph',
     'tests/python/pants_test/tasks:task_test_base',
-  ]
+  ],
 )
 
 python_tests(
   name='go_workspace_task',
   sources=['test_go_workspace_task.py'],
-  dependencies=[
+  dependencies = [
     'contrib/go/src/python/pants/contrib/go/targets:go_library',
     'contrib/go/src/python/pants/contrib/go/targets:go_remote_library',
     'contrib/go/src/python/pants/contrib/go/tasks:go_workspace_task',
     'src/python/pants/util:contextutil',
     'src/python/pants/util:dirutil',
     'tests/python/pants_test/tasks:task_test_base',
-  ]
+  ],
 )
 
 python_tests(
   name='go_compile',
   sources=['test_go_compile.py'],
-  dependencies=[
+  dependencies = [
     'contrib/go/src/python/pants/contrib/go/targets:go_library',
     'contrib/go/src/python/pants/contrib/go/tasks:go_compile',
     'src/python/pants/util:dirutil',
     'tests/python/pants_test/tasks:task_test_base',
-  ]
+  ],
 )
 
 python_tests(
   name='go_fetch',
   sources=['test_go_fetch.py'],
-  dependencies=[
+  dependencies = [
     'contrib/go/src/python/pants/contrib/go/subsystems',
     'contrib/go/src/python/pants/contrib/go/targets:go_remote_library',
     'contrib/go/src/python/pants/contrib/go/tasks:go_fetch',
     'src/python/pants/build_graph',
     'src/python/pants/util:contextutil',
     'tests/python/pants_test/tasks:task_test_base',
-  ]
+  ],
 )
 
 python_tests(
   name='go_go',
   sources=['test_go_go.py'],
-  dependencies=[
+  dependencies = [
     'contrib/go/src/python/pants/contrib/go/targets:go_binary',
     'contrib/go/src/python/pants/contrib/go/tasks:go_go',
     'src/python/pants/util:contextutil',
     'tests/python/pants_test/tasks:task_test_base',
-  ]
+  ],
 )
 
 python_tests(
   name='go_compile_integration',
   sources=['test_go_compile_integration.py'],
-  dependencies=[
+  dependencies = [
     'contrib/go/src/python/pants/contrib/go/subsystems',
-    'src/python/pants/util:contextutil',
     'tests/python/pants_test/subsystem:subsystem_utils',
     'tests/python/pants_test/testutils:file_test_util',
     'tests/python/pants_test:int-test',
@@ -91,7 +89,7 @@ python_tests(
 python_tests(
   name='go_test_integration',
   sources=['test_go_test_integration.py'],
-  dependencies=[
+  dependencies = [
     'src/python/pants/util:dirutil',
     'tests/python/pants_test:int-test',
   ],
@@ -101,12 +99,9 @@ python_tests(
 python_tests(
   name='go_thrift_gen_integration',
   sources=['test_go_thrift_gen_integration.py'],
-  dependencies=[
-    'contrib/go/src/python/pants/contrib/go/subsystems',
+  dependencies = [
     'src/python/pants/base:build_environment',
-    'src/python/pants/util:contextutil',
     'src/python/pants/util:dirutil',
-    'tests/python/pants_test/subsystem:subsystem_utils',
     'tests/python/pants_test/testutils:file_test_util',
     'tests/python/pants_test:int-test',
   ],
@@ -117,7 +112,7 @@ python_tests(
 python_tests(
   name='go_run_integration',
   sources=['test_go_run_integration.py'],
-  dependencies=[
+  dependencies = [
     'tests/python/pants_test:int-test',
   ],
   tags={'integration'},
@@ -126,7 +121,7 @@ python_tests(
 python_tests(
   name='go_fetch_integration',
   sources=['test_go_fetch_integration.py'],
-  dependencies=[
+  dependencies = [
     'tests/python/pants_test:int-test',
   ],
   tags={'integration'},
@@ -135,7 +130,7 @@ python_tests(
 python_tests(
   name='go_task',
   sources=['test_go_task.py'],
-  dependencies=[
+  dependencies = [
     'contrib/go/src/python/pants/contrib/go/tasks:go_task',
     'tests/python/pants_test/tasks:task_test_base',
   ],

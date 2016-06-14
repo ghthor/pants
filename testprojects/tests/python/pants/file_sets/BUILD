@@ -5,7 +5,6 @@ python_library(
                    ['aaa.py', 'dir1/aaa.py']
                  ]
                 ),
-  dependencies=[]
 )
 
 python_library(
@@ -15,7 +14,6 @@ python_library(
                    globs('*bb.py', 'dir1/dirdir1/*aa.py')
                  ]
                 ),
-  dependencies=[]
 )
 
 python_library(
@@ -25,7 +23,6 @@ python_library(
                   'aa.py', 'ab.py'
                  ]
                 ),
-  dependencies=[]
 )
 
 python_library(
@@ -35,7 +32,6 @@ python_library(
                    set(['aaa.py', 'a.py'])
                  ]
                 ),
-  dependencies=[]
 )
 
 python_library(
@@ -45,7 +41,6 @@ python_library(
                    rglobs('*b.py')
                  ]
                 ),
-  dependencies=[]
 )
 
 python_library(
@@ -55,7 +50,6 @@ python_library(
                    zglobs('**/*b.py')
                  ]
                 ),
-  dependencies=[]
 )
 
 python_library(
@@ -66,5 +60,4 @@ python_library(
                    zglobs('**/a.py')
                  ]
                 ),
-  dependencies=[]
 )

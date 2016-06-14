@@ -5,7 +5,7 @@ python_library(
   name='plugin',
   sources=['register.py'],
   dependencies=[
-    '3rdparty/python/twitter/commons:twitter.common.collections',
+    '3rdparty/python:twitter.common.collections',
     'src/python/pants/backend/python/targets:python',
     'src/python/pants/backend/python:python_artifact',
     'src/python/pants/base:build_environment',

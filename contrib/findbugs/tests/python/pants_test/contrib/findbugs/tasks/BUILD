@@ -4,18 +4,18 @@
 python_tests(
   name='tasks',
   sources=['test_findbugs.py'],
-  dependencies=[
-    'contrib/findbugs/src/python/pants/contrib/findbugs/tasks:tasks',
-    'tests/python/pants_test/backend/python/tasks:python_task_test_base',
-    'tests/python/pants_test/option/util',
-    'tests/python/pants_test:base_test',
-  ]
+  dependencies = [
+    'contrib/findbugs/src/python/pants/contrib/findbugs/tasks',
+    'tests/python/pants_test/tasks:task_test_base',
+  ],
 )
 
 python_tests(
   name='integration',
   sources=['test_findbugs_integration.py'],
-  dependencies=[
+  dependencies = [
+    'src/python/pants/base:build_environment',
+    'src/python/pants/util:contextutil',
     'tests/python/pants_test:int-test',
   ],
   tags={'integration'},

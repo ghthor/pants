@@ -5,11 +5,11 @@ python_tests(
   name = 'executor',
   sources = ['test_executor.py'],
   dependencies = [
-    'src/python/pants/java/distribution:distribution',
+    'src/python/pants/java/distribution',
     'src/python/pants/java:executor',
     'src/python/pants/util:contextutil',
     'src/python/pants/util:dirutil',
-  ]
+  ],
 )
 
 python_tests(
@@ -19,7 +19,9 @@ python_tests(
   dependencies = [
     '3rdparty/python:mock',
     'src/python/pants/java:nailgun_client',
-  ]
+    'src/python/pants/java:nailgun_io',
+    'src/python/pants/java:nailgun_protocol',
+  ],
 )
 
 python_tests(
@@ -30,8 +32,8 @@ python_tests(
     '3rdparty/python:mock',
     '3rdparty/python:psutil',
     'src/python/pants/java:nailgun_executor',
-    'tests/python/pants_test:base_test'
-  ]
+    'tests/python/pants_test:base_test',
+  ],
 )
 
 python_tests(
@@ -41,7 +43,8 @@ python_tests(
   dependencies = [
     '3rdparty/python:mock',
     'src/python/pants/java:nailgun_io',
-  ]
+    'src/python/pants/java:nailgun_protocol',
+  ],
 )
 
 python_tests(
@@ -51,7 +54,7 @@ python_tests(
   dependencies = [
     '3rdparty/python:mock',
     'src/python/pants/java:nailgun_protocol',
-  ]
+  ],
 )
 
 python_tests(
@@ -59,16 +62,19 @@ python_tests(
   sources = ['test_util.py'],
   dependencies = [
     '3rdparty/python:mock',
+    'src/python/pants/java/jar:manifest',
+    'src/python/pants/java:executor',
     'src/python/pants/java:util',
+    'src/python/pants/util:contextutil',
     'src/python/pants/util:dirutil',
-  ]
+  ],
 )
 
 python_tests(
   name = 'nailgun_integration',
   sources = ['test_nailgun_integration.py'],
   dependencies = [
-    'tests/python/pants_test:int-test'
+    'tests/python/pants_test:int-test',
   ],
   tags = {'integration'},
 )

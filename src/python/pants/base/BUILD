@@ -9,7 +9,7 @@ python_library(
     'src/python/pants/scm',
     'src/python/pants/scm:git',  # (mateo) Force a buildgen dep for an inlined import.
     'src/python/pants:version',
-  ]
+  ],
 )
 
 python_library(
@@ -21,17 +21,16 @@ python_library(
     'src/python/pants/util:dirutil',
     'src/python/pants/util:meta',
     'src/python/pants/util:objects',
-  ]
+  ],
 )
 
 python_library(
   name = 'file_system_project_tree',
   sources = ['file_system_project_tree.py'],
   dependencies = [
-    '3rdparty/python:scandir',
     ':project_tree',
     'src/python/pants/util:dirutil',
-  ]
+  ],
 )
 
 python_library(
@@ -39,20 +38,20 @@ python_library(
   sources = ['scm_project_tree.py'],
   dependencies = [
     ':project_tree',
+    'src/python/pants/util:dirutil',
     'src/python/pants/util:memo',
-  ]
+  ],
 )
 
 python_library(
   name = 'build_file',
   sources = ['build_file.py'],
   dependencies = [
-    '3rdparty/python/twitter/commons:twitter.common.collections',
     '3rdparty/python:pathspec',
+    '3rdparty/python:twitter.common.collections',
     'src/python/pants/util:dirutil',
     'src/python/pants/util:meta',
-    ':project_tree',
-  ]
+  ],
 )
 
 python_library(
@@ -60,7 +59,7 @@ python_library(
   sources = ['build_file_target_factory.py'],
   dependencies = [
     'src/python/pants/util:meta',
-  ]
+  ],
 )
 
 python_library(
@@ -78,7 +77,7 @@ python_library(
     '3rdparty/python:six',
     ':revision',
     'src/python/pants:version',
-  ]
+  ],
 )
 
 python_library(
@@ -91,16 +90,16 @@ python_library(
   sources = ['fingerprint_strategy.py'],
   dependencies = [
     'src/python/pants/util:meta',
-  ]
+  ],
 )
 
 python_library(
   name = 'generator',
   sources = ['generator.py'],
   dependencies = [
-    ':mustache',
     '3rdparty/python:pystache',
-  ]
+    ':mustache',
+  ],
 )
 
 python_library(
@@ -114,7 +113,7 @@ python_library(
   dependencies = [
     '3rdparty/python:pystache',
     '3rdparty/python:six',
-  ]
+  ],
 )
 
 python_library(
@@ -131,9 +130,9 @@ python_library(
   name = 'payload_field',
   sources = ['payload_field.py'],
   dependencies = [
-    '3rdparty/python/twitter/commons:twitter.common.collections',
+    '3rdparty/python:twitter.common.collections',
     'src/python/pants/util:meta',
-  ]
+  ],
 )
 
 python_library(
@@ -164,18 +163,16 @@ python_library(
   name = 'cmd_line_spec_parser',
   sources = ['cmd_line_spec_parser.py'],
   dependencies = [
-    '3rdparty/python/twitter/commons:twitter.common.collections',
-    ':build_file',
     ':specs',
-    'src/python/pants/build_graph',
   ],
 )
 
+# TODO(pl): Bust out the report dependency.
 python_library(
   name = 'worker_pool',
   sources = ['worker_pool.py'],
   dependencies = [
-    'src/python/pants/reporting:report', # TODO(pl): Bust this out
+    'src/python/pants/reporting:report',
   ],
 )
 
@@ -193,9 +190,9 @@ python_library(
 python_library(
   name='validation',
   sources=['validation.py'],
-  dependencies=[
-    '3rdparty/python/twitter/commons:twitter.common.collections',
-    '3rdparty/python/twitter/commons:twitter.common.dirutil',
+  dependencies = [
     '3rdparty/python:six',
+    '3rdparty/python:twitter.common.collections',
+    '3rdparty/python:twitter.common.dirutil',
   ],
 )
