@@ -7,7 +7,7 @@ from __future__ import (absolute_import, division, generators, nested_scopes, pr
 
 from pants.base.revision import Revision
 
-VERSION = '1.1.0-pre5'
+VERSION = '1.1.1'
 
 
 PANTS_SEMVER = Revision.semver(VERSION)
