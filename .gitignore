@@ -14,6 +14,7 @@
 .DS_Store
 .build.properties
 .buildcache/
+.buildgen_timestamp
 .coverage*
 .idea
 .cache
