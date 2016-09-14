@@ -68,6 +68,15 @@ class WebPackResolve(NodeResolve):
   def global_subsystems(cls):
     return super(WebPackResolve, cls).global_subsystems() + (WebPackResolver,)
 
+  @classmethod
+  def prepare(cls, options, round_manager):
+    """Allow each resolver to declare additional product requirements."""
+    WebPackResolver.prepare(options, round_manager)
+
+  @classmethod
+  def product_types(cls):
+    return ['webpack_distribution']
+
   def cache_target_dirs(self):
     return True
 
@@ -76,7 +85,6 @@ class WebPackResolve(NodeResolve):
     if not targets:
       return
 
-    # TODO(mateo): This pipeline continually downloads the node.tar for each invalidation - needs followup.
     node_paths = self.context.products.get_data(NodePaths, init_func=NodePaths)
 
     invalidation_context = self.invalidated(
