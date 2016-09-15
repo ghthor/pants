@@ -17,6 +17,7 @@ jvm_app(name='main',
 
 jvm_binary(name = 'main-bin',
   dependencies = [
+    'contrib/node/examples/src/node/web-project',
     'examples/src/java/org/pantsbuild/example/hello/greet',
   ],
   resources=[

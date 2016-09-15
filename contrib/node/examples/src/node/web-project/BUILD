@@ -11,9 +11,3 @@ webpack_module(
   ]
 )
 
-node_test(
-  name='unit',
-  dependencies=[
-    ':web-project'
-  ]
-)

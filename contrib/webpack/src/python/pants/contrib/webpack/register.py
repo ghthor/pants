@@ -27,6 +27,10 @@ def global_subsystems():
 def register_goals():
   Goal.register('webpack', 'Build Node.js webpack modules.')
 
+  Goal.by_name('repl').uninstall_task('node')
+  Goal.by_name('test').uninstall_task('node')
+  Goal.by_name('resolve').uninstall_task('node')
+
   # These are manually installed into a goal for convienance, while we get the scheduling conflicts resolved.
   task(name='webpack-resolve', action=WebPackResolve).install('webpack')
   task(name='webpack', action=WebPack).install('webpack')
