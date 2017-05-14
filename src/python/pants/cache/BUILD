@@ -5,6 +5,8 @@ python_library(
   name = 'cache',
   sources = globs('*.py'),
   dependencies = [
+    '3rdparty/python:boto3',
+    '3rdparty/python:pyjavaproperties',
     '3rdparty/python:requests',
     '3rdparty/python:six',
     'src/python/pants/base:deprecated',
