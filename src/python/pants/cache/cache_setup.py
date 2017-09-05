@@ -85,12 +85,14 @@ class CacheSetup(Subsystem):
              help='number of times pinger tries a cache')
     register('--write-permissions', advanced=True, type=str, default=None,
              help='Permissions to use when writing artifacts to a local cache, in octal.')
-    register('--s3-credential-file', advanced=True, type=str,
-             default=os.path.expanduser('~/.pants/.s3credentials'),
-             help='File containing s3 credentials to use for s3 cache, in java properties format.')
+    # NOTE(mateo): It would probably be more clear to the consumer to include the Boto3 defaults
+    # explicitely, although it could bitrot.
+    register('--s3-config-file', advanced=True, type=str,
+             help='Boto config file in .ini syntax. Falls back to Boto3 defaults if unset.')
+    register('--s3-credentials-file', advanced=True, type=str,
+             help='AWS credentials file in .ini syntax. Falls back to Boto3 defaults if unset.')
     register('--s3-profile', advanced=True, type=str,
-             default=None,
-             help='Boto profile to use for accessing the S3 cache.')
+             help='Boto profile to use for accessing S3. Falls back to Boto3 defaults if unset.')
 
   @classmethod
   def create_cache_factory_for_task(cls, task, pinger=None, resolver=None):
@@ -295,8 +297,13 @@ class CacheFactory(object):
           raise InvalidCacheSpecError('S3 Cache only supports a single entry, got: {0}'.format(
             remote_spec))
         return S3ArtifactCache(
-          self._options.s3_credential_file,
-          self._options.s3_profile, artifact_root, urls[0], local_cache)
+          self._options.s3_credentials_file,
+          self._options.s3_config_file,
+          self._options.s3_profile,
+          artifact_root,
+          urls[0],
+          local_cache,
+        )
 
       available_urls = self.get_available_urls(urls)
       if len(available_urls) == 0:

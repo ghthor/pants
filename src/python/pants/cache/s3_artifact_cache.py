@@ -13,9 +13,8 @@ from botocore import exceptions
 from botocore.config import Config
 from botocore.vendored.requests import ConnectionError, Timeout
 from botocore.vendored.requests.packages.urllib3.exceptions import ClosedPoolError
-from pyjavaproperties import Properties
 from six.moves.urllib.parse import urlparse
-
+from pants.util.memo import memoized_property, memoized
 from pants.cache.artifact_cache import ArtifactCache, NonfatalArtifactCacheError, UnreadableArtifact
 
 
@@ -26,38 +25,40 @@ _NETWORK_ERRORS = [
   exceptions.EndpointConnectionError, exceptions.ChecksumError
 ]
 
-def _connect_to_s3(config_file, profile_name):
-  # Yeah, I know it's gross but it spams the logs without it:
+# TODO: Read size is exposed both here and the restful client, should be wired as an option.
+_READ_SIZE_BYTES = 4 * 1024 * 1024
+
+# Mapping of the environmental variables respected by Boto3. None of this is properly "secret",
+# Pants stays out of that business and just leaves them for the Boto3 API to parse.
+# NOTE(mateo): Boto2 appears to have a different set of configs/variables, this may support boto3 only.
+_BOTO3_ENVS = {
+  'credentials': 'AWS_SHARED_CREDENTIALS_FILE',
+  'profile': 'AWS_PROFILE',
+  'config': 'AWS_CONFIG_FILE',
+}
+
+
+@memoized
+def _connect_to_s3(creds_file, config_file, profile_name):
+  # Downgrading the boto logging since it spams the logs.
+  # TODO(mateo): Wire a boto logging option.
   boto3.set_stream_logger(name='boto3.resources', level=logging.WARN)
   boto3.set_stream_logger(name='botocore', level=logging.WARN)
 
-  boto_kwargs = {}
-  if profile_name:
-    boto_kwargs['profile_name'] = profile_name
+  added_envs = {}
+  added_envs[_BOTO3_ENVS['credentials']] = creds_file
+  added_envs[_BOTO3_ENVS['config']] = config_file
+  added_envs[_BOTO3_ENVS['profile']] = profile_name
 
-  try:
-    with open(config_file, 'r') as f:
-      p = Properties()
-      p.load(f)
+  env = os.environ
+  for var, value in added_envs.items():
+    if value:
+      logger.debug('Set {} as {}'.format(var, value))
+      env[var] = value
 
-      access_key = p.get('accessKey')
-      if access_key:
-        logger.debug('Reading access key from {0}'.format(config_file))
-        boto_kwargs['aws_access_key_id'] = access_key
-
-      secret_key = p.get('secretKey')
-      if secret_key:
-        logger.debug('Reading access key from {0}'.format(config_file))
-        boto_kwargs['aws_secret_access_key'] = secret_key
-  except IOError:
-    logger.debug('Could not load {0}, using ENV vars'.format(config_file))
-
-  session = boto3.Session(**boto_kwargs)
+  session = boto3.Session()
   config = Config(connect_timeout=4, read_timeout=4)
   return session.resource('s3', config=config)
-
-
-_READ_SIZE_BYTES = 4 * 1024 * 1024
 
 
 def iter_content(body):
@@ -96,20 +97,29 @@ def _log_and_classify_error(e, verb, cache_key):
 class S3ArtifactCache(ArtifactCache):
   """An artifact cache that stores the artifacts on S3."""
 
-  def __init__(self, config_file, profile_name, artifact_root, s3_url, local):
+  def __init__(self, creds_file, config_file, profile_name, artifact_root, s3_url, local):
     """
-    :param artifact_root: The path under which cacheable products will be read/written
-    :param s3_url: URL of the form s3://bucket/path/to/store/artifacts
-    :param BaseLocalArtifactCache local: local cache instance for storing and creating artifacts
+    :param str creds_file: Path that holds AWS credentials as understood by Boto.
+    :param str config_file: Path that holds Boto config file.
+    :param str profile_name: Specifies a profile set in the creds file for use byBoto.
+    :param str artifact_root: The path under which cacheable products will be read/written.
+    :param str s3_url: URL of the form s3://bucket/path/to/store/artifacts.
+    :param BaseLocalArtifactCache local: local cache instance for storing and creating artifacts.
     """
     super(S3ArtifactCache, self).__init__(artifact_root)
     url = urlparse(s3_url)
-    self._s3 = _connect_to_s3(config_file, profile_name)
+    self._creds_file = creds_file
+    self._config_file = config_file
+    self._profile_name = profile_name
     self._path = url.path
     if self._path.startswith('/'):
       self._path = self._path[1:]
     self._localcache = local
     self._bucket = url.netloc
+
+  @memoized_property
+  def connection(self):
+    return _connect_to_s3(self._creds_file, self._config_file, self._profile_name)
 
   def try_insert(self, cache_key, paths):
     logger.debug('Insert {0}'.format(cache_key))
@@ -172,7 +182,7 @@ class S3ArtifactCache(ArtifactCache):
       _log_and_classify_error(e, 'DELETE', cache_key)
 
   def _get_object(self, cache_key):
-    return self._s3.Object(self._bucket, self._path_for_key(cache_key))
+    return self.connection.Object(self._bucket, self._path_for_key(cache_key))
 
   def _path_for_key(self, cache_key):
     return '{0}/{1}/{2}.tgz'.format(self._path, cache_key.id, cache_key.hash)
