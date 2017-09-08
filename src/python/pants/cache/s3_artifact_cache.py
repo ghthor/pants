@@ -8,9 +8,11 @@ from __future__ import (absolute_import, division, generators, nested_scopes, pr
 import logging
 import os
 
+from textwrap import dedent
 import boto3
 from botocore import exceptions
 from botocore.config import Config
+from ConfigParser import ConfigParser, NoSectionError
 from botocore.vendored.requests import ConnectionError, Timeout
 from botocore.vendored.requests.packages.urllib3.exceptions import ClosedPoolError
 from six.moves.urllib.parse import urlparse
@@ -28,14 +30,18 @@ _NETWORK_ERRORS = [
 # TODO: Read size is exposed both here and the restful client, should be wired as an option.
 _READ_SIZE_BYTES = 4 * 1024 * 1024
 
-# Mapping of the environmental variables respected by Boto3. None of this is properly "secret",
-# Pants stays out of that business and just leaves them for the Boto3 API to parse.
-# NOTE(mateo): Boto2 appears to have a different set of configs/variables, this may support boto3 only.
+# NOTE(mateo): Boto2 has a different set of configs/variables, this likely supports boto3 only.
 _BOTO3_ENVS = {
-  'credentials': 'AWS_SHARED_CREDENTIALS_FILE',
-  'profile': 'AWS_PROFILE',
-  'config': 'AWS_CONFIG_FILE',
+  'profile': 'aws_profile',
+  'access_key': 'aws_access_key_id',
+  'secret_key': 'aws_secret_access_key',
 }
+# Used if the cache_setup options do not define a config_file option.
+_BOTO_CONFIG_DEFAULT_KWARGS = dict(connect_timeout=4, read_timeout=4)
+
+
+class S3ConfigException(Exception):
+  """Indicate a problem parsing or finding the config files for the s3 connection."""
 
 
 @memoized
@@ -45,19 +51,31 @@ def _connect_to_s3(creds_file, config_file, profile_name):
   boto3.set_stream_logger(name='boto3.resources', level=logging.WARN)
   boto3.set_stream_logger(name='botocore', level=logging.WARN)
 
-  added_envs = {}
-  added_envs[_BOTO3_ENVS['credentials']] = creds_file
-  added_envs[_BOTO3_ENVS['config']] = config_file
-  added_envs[_BOTO3_ENVS['profile']] = profile_name
+  creds = ConfigParser()
+  
+  parsed = creds.read(creds_file)
+  try:
+    access_key = creds.get(profile_name, 'aws_aczcess_key_id')
+    secret_key = creds.get(profile_name, 'aws_secret_access_key')
+  except NoSectionError as e:
+    raise S3ConfigException(dedent(
+      """
+      Credentials file appears malformed. Should approximate:
 
-  env = os.environ
-  for var, value in added_envs.items():
-    if value:
-      logger.debug('Set {} as {}'.format(var, value))
-      env[var] = value
+      [<profile>]
+      aws_access_key_id = <access_key>
+      aws_secret_access_key = <secret_key>
 
-  session = boto3.Session()
-  config = Config(connect_timeout=4, read_timeout=4)
+      """
+    ))
+  session = boto3.Session(
+    aws_access_key_id=access_key,
+    aws_secret_access_key=secret_key,
+  )
+  # TODO(mateo): May require expanded coverage as we witness and plug errors swallowed by the
+  # invoking subprocess map. We want to silently proceed on cache error, but alert on bad input.
+  config = config_file or Config(**_BOTO_CONFIG_DEFAULT_KWARGS)
+  
   return session.resource('s3', config=config)
 
 
@@ -110,16 +128,32 @@ class S3ArtifactCache(ArtifactCache):
     url = urlparse(s3_url)
     self._creds_file = creds_file
     self._config_file = config_file
-    self._profile_name = profile_name
     self._path = url.path
     if self._path.startswith('/'):
       self._path = self._path[1:]
     self._localcache = local
     self._bucket = url.netloc
+    self.profile_name = profile_name
+
+  @memoized_property
+  def creds_file(self):
+    if self._creds_file and not os.path.isfile(self._creds_file):
+      raise S3ConfigException(
+        "Could not find passed AWS credentials file: {}".format(self._creds_file)
+      )
+    return self._creds_file
+
+  @memoized_property
+  def config_file(self):
+    if self._config_file and not os.path.isfile(self._config_file):
+      raise S3ConfigException(
+        "Could not find passed Boto config file: {}".format(self._config_file)
+      )
+    return self._config_file
 
   @memoized_property
   def connection(self):
-    return _connect_to_s3(self._creds_file, self._config_file, self._profile_name)
+    return _connect_to_s3(self.creds_file, self.config_file, self.profile_name)
 
   def try_insert(self, cache_key, paths):
     logger.debug('Insert {0}'.format(cache_key))
