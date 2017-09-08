@@ -27,17 +27,18 @@ _NETWORK_ERRORS = [
   exceptions.EndpointConnectionError, exceptions.ChecksumError
 ]
 
-# TODO: Read size is exposed both here and the restful client, should be wired as an option.
-_READ_SIZE_BYTES = 4 * 1024 * 1024
-
 # NOTE(mateo): Boto2 has a different set of configs/variables, this likely supports boto3 only.
 _BOTO3_ENVS = {
   'profile': 'aws_profile',
   'access_key': 'aws_access_key_id',
   'secret_key': 'aws_secret_access_key',
 }
+
 # Used if the cache_setup options do not define a config_file option.
-_BOTO_CONFIG_DEFAULT_KWARGS = dict(connect_timeout=4, read_timeout=4)
+_BOTO3_CONFIG_DEFAULT_KWARGS = dict(connect_timeout=4, read_timeout=4)
+
+# TODO: Read size is exposed both here and the restful client, should be wired as an option.
+_READ_SIZE_BYTES = 4 * 1024 * 1024
 
 
 class S3ConfigException(Exception):
@@ -50,32 +51,30 @@ def _connect_to_s3(creds_file, config_file, profile_name):
   # TODO(mateo): Wire a boto logging option.
   boto3.set_stream_logger(name='boto3.resources', level=logging.WARN)
   boto3.set_stream_logger(name='botocore', level=logging.WARN)
+  auth_kwargs = {}
+  if creds_file:
+    creds = ConfigParser()
+    parsed = creds.read(creds_file)
+    try:
+      auth_kwargs['aws_access_key_id'] = creds.get(profile_name, 'aws_access_key_id')
+      auth_kwargs['aws_secret_access_key'] = creds.get(profile_name, 'aws_secret_access_key')
+    except NoSectionError as e:
+      # Actually raise here, since in this case we know that the user has passed a misconfigured
+      # option or input and that would be surprisingly unapplied.
+      raise S3ConfigException(dedent(
+        """
+        Credentials file appears malformed. Should approximate:
 
-  creds = ConfigParser()
-  
-  parsed = creds.read(creds_file)
-  try:
-    access_key = creds.get(profile_name, 'aws_aczcess_key_id')
-    secret_key = creds.get(profile_name, 'aws_secret_access_key')
-  except NoSectionError as e:
-    raise S3ConfigException(dedent(
-      """
-      Credentials file appears malformed. Should approximate:
+        [<profile>]
+        aws_access_key_id = <access_key>
+        aws_secret_access_key = <secret_key>
 
-      [<profile>]
-      aws_access_key_id = <access_key>
-      aws_secret_access_key = <secret_key>
-
-      """
-    ))
-  session = boto3.Session(
-    aws_access_key_id=access_key,
-    aws_secret_access_key=secret_key,
-  )
-  # TODO(mateo): May require expanded coverage as we witness and plug errors swallowed by the
-  # invoking subprocess map. We want to silently proceed on cache error, but alert on bad input.
-  config = config_file or Config(**_BOTO_CONFIG_DEFAULT_KWARGS)
-  
+        """
+      ))
+  # If no cred_file is passed, we allow Boto to attempt to consume from its respected environmental
+  # variables and/or traditional credential locations.
+  session = boto3.Session(**auth_kwargs)
+  config = config_file or Config(**_BOTO3_CONFIG_DEFAULT_KWARGS)
   return session.resource('s3', config=config)
 
 
