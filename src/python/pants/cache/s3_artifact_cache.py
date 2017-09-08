@@ -53,11 +53,10 @@ def _connect_to_s3(creds_file, config_file, profile_name):
   boto3.set_stream_logger(name='botocore', level=logging.WARN)
   auth_kwargs = {}
   if creds_file:
-    creds = ConfigParser()
-    parsed = creds.read(creds_file)
+    config = ConfigParser().read(creds_file)
     try:
-      auth_kwargs['aws_access_key_id'] = creds.get(profile_name, 'aws_access_key_id')
-      auth_kwargs['aws_secret_access_key'] = creds.get(profile_name, 'aws_secret_access_key')
+      auth_kwargs['aws_access_key_id'] = config.get(profile_name, 'aws_access_key_id')
+      auth_kwargs['aws_secret_access_key'] = config.get(profile_name, 'aws_secret_access_key')
     except NoSectionError as e:
       # Actually raise here, since in this case we know that the user has passed a misconfigured
       # option or input and that would be surprisingly unapplied.
@@ -71,8 +70,8 @@ def _connect_to_s3(creds_file, config_file, profile_name):
 
         """
       ))
-  # If no cred_file is passed, we allow Boto to attempt to consume from its respected environmental
-  # variables and/or traditional credential locations.
+  # If no cred_file is passed, we allow Boto to attempt to consume from its respected
+  # environmental variables and/or traditional credential locations.
   session = boto3.Session(**auth_kwargs)
   config = config_file or Config(**_BOTO3_CONFIG_DEFAULT_KWARGS)
   return session.resource('s3', config=config)

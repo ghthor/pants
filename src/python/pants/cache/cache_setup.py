@@ -91,7 +91,7 @@ class CacheSetup(Subsystem):
              help='Boto config file in .ini syntax. Falls back to Boto3 defaults if unset.')
     register('--s3-credentials-file', advanced=True, type=str,
              help='AWS credentials file in .ini syntax. Falls back to Boto3 defaults if unset.')
-    register('--s3-profile', advanced=True, type=str,
+    register('--s3-profile', advanced=True, type=str, default='default',
              help='Boto profile to use for accessing S3. Falls back to Boto3 defaults if unset.')
 
   @classmethod
