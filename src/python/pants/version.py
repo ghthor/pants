@@ -8,6 +8,6 @@ from __future__ import (absolute_import, division, generators, nested_scopes, pr
 from packaging.version import Version
 
 
-VERSION = '1.2.1+fs1c'
+VERSION = '1.2.1+fs1d'
 
 PANTS_SEMVER = Version(VERSION)
