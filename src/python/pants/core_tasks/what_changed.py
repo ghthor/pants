@@ -26,8 +26,7 @@ class WhatChanged(ConsoleTask):
   def subsystem_dependencies(cls):
     return super(WhatChanged, cls).subsystem_dependencies() + (Changed.Factory,)
 
-  @deprecated('1.5.0.dev0', 'Use e.g. `./pants --changed-parent=HEAD list` instead.',
-              '`./pants changed`')
+  # @deprecated('1.5.0.dev0', 'Use e.g. `./pants --changed-parent=HEAD list` instead.', '`./pants changed`')
   def console_output(self, _):
     # N.B. This task shares an options scope ('changed') with the `Changed` subsystem.
     options = self.get_options()
