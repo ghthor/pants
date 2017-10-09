@@ -53,7 +53,8 @@ def _connect_to_s3(creds_file, config_file, profile_name):
   boto3.set_stream_logger(name='botocore', level=logging.WARN)
   auth_kwargs = {}
   if creds_file:
-    config = ConfigParser().read(creds_file)
+    config = ConfigParser()
+    config.read(creds_file)
     try:
       auth_kwargs['aws_access_key_id'] = config.get(profile_name, 'aws_access_key_id')
       auth_kwargs['aws_secret_access_key'] = config.get(profile_name, 'aws_secret_access_key')
