@@ -34,6 +34,7 @@ _DEFAULT_PATH_BY_ID = {
   ('darwin', '14'): ('mac', '10.10'),
   ('darwin', '15'): ('mac', '10.11'),
   ('darwin', '16'): ('mac', '10.12'),
+  ('darwin', '17'): ('mac', '10.13'),
 }
 
 
@@ -55,7 +56,14 @@ class BinaryUtil(object):
     @classmethod
     def register_options(cls, register):
       register('--baseurls', type=list, advanced=True,
-               default=['https://dl.bintray.com/pantsbuild/bin/build-support'],
+               default=['https://binaries.pantsbuild.org',
+                        # NB: The 1.3.x branch uses a native engine packaging scheme and release
+                        # process that differs widely from the mainline. As a result, we include
+                        # the legacy bintray url (where the native engine is deployed to on this
+                        # branch) to allow for deployment and fetching of the native engine without
+                        # major surgery on the deployment and release processes.
+                        # See: https://github.com/pantsbuild/pants/issues/5061
+                        'https://dl.bintray.com/pantsbuild/bin/build-support'],
                help='List of urls from which binary tools are downloaded.  Urls are searched in '
                     'order until the requested path is found.')
       register('--fetch-timeout-secs', type=int, default=30, advanced=True,
