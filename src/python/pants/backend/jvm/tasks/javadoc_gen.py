@@ -8,6 +8,7 @@ from __future__ import (absolute_import, division, generators, nested_scopes, pr
 import os
 
 from pants.backend.jvm.tasks.jvmdoc_gen import Jvmdoc, JvmdocGen
+from pants.backend.jvm.targets.scala_library import ScalaLibrary
 from pants.java.distribution.distribution import DistributionLocator
 from pants.java.executor import SubprocessExecutor
 from pants.util.memo import memoized
@@ -27,7 +28,7 @@ class JavadocGen(JvmdocGen):
 
   def execute(self):
     def is_java(target):
-      return target.has_sources('.java')
+      return target.has_sources('.java') and not isinstance(target, ScalaLibrary)
 
     self.generate_doc(is_java, self.create_javadoc_command)
 
