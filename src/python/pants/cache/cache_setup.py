@@ -285,10 +285,7 @@ class CacheFactory(object):
 
     def create_remote_cache(remote_spec, local_cache):
       urls = self.get_available_urls(remote_spec.split('|'))
-
       if len(urls) > 0:
-        best_url_selector = BestUrlSelector(['{}/{}'.format(url.rstrip('/'), self._stable_name)
-                                             for url in urls])
         local_cache = local_cache or TempLocalArtifactCache(artifact_root, compression)
         if any(map(self._is_s3, urls)):
           if len(urls) != 1:
@@ -302,8 +299,10 @@ class CacheFactory(object):
             urls[0],
             local_cache,
           )
-
+        best_url_selector = BestUrlSelector(['{}/{}'.format(url.rstrip('/'), self._stable_name)
+                                             for url in urls])
         return RESTfulArtifactCache(artifact_root, best_url_selector, local_cache)
+
     local_cache = create_local_cache(spec.local) if spec.local else None
     remote_cache = create_remote_cache(spec.remote, local_cache) if spec.remote else None
     if remote_cache:
