@@ -7,17 +7,18 @@ from __future__ import (absolute_import, division, generators, nested_scopes, pr
 
 import logging
 import os
-
+from ConfigParser import ConfigParser, NoSectionError
 from textwrap import dedent
+
 import boto3
 from botocore import exceptions
 from botocore.config import Config
-from ConfigParser import ConfigParser, NoSectionError
 from botocore.vendored.requests import ConnectionError, Timeout
 from botocore.vendored.requests.packages.urllib3.exceptions import ClosedPoolError
 from six.moves.urllib.parse import urlparse
-from pants.util.memo import memoized_property, memoized
+
 from pants.cache.artifact_cache import ArtifactCache, NonfatalArtifactCacheError, UnreadableArtifact
+from pants.util.memo import memoized, memoized_property
 
 
 logger = logging.getLogger(__name__)

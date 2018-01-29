@@ -3,7 +3,6 @@
 
 go_library(
   dependencies=[
-    'contrib/go/examples/src/go/libE',
-    'contrib/go/examples/src/go/libD',
+    'contrib/go/examples/src/go/duckthrift/gen',
   ]
 )
