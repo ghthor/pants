@@ -3,7 +3,7 @@
 
 go_library(
   dependencies=[
-    'contrib/go/examples/src/go/libB',
     'contrib/go/examples/src/go/libC',
+    'contrib/go/examples/src/go/libB',
   ]
 )
