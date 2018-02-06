@@ -29,7 +29,7 @@ from pants.build_graph.files import Files
 from pants.build_graph.target import Target
 from pants.invalidation.cache_manager import VersionedTargetSet
 from pants.task.task import Task
-from pants.task.testrunner_task_mixin import TestRunnerTaskMixin
+from pants.task.testrunner_task_mixin import TestResult, TestRunnerTaskMixin
 from pants.util.contextutil import pushd, temporary_dir, temporary_file
 from pants.util.dirutil import mergetree, safe_mkdir, safe_mkdir_for
 from pants.util.memo import memoized_method, memoized_property
@@ -39,17 +39,21 @@ from pants.util.strutil import safe_shlex_split
 from pants.util.xml_parser import XmlParser
 
 
-class _Workdirs(datatype('_Workdirs', ['root_dir'])):
+class _Workdirs(datatype('_Workdirs', ['root_dir', 'partition'])):
   @classmethod
-  def for_targets(cls, work_dir, targets):
-    root_dir = os.path.join(work_dir, Target.maybe_readable_identify(targets))
+  def for_partition(cls, work_dir, partition):
+    root_dir = os.path.join(work_dir, Target.maybe_readable_identify(partition))
     safe_mkdir(root_dir, clean=False)
-    return cls(root_dir=root_dir)
+    return cls(root_dir=root_dir, partition=partition)
+
+  @memoized_method
+  def target_set_id(self, *targets):
+    return Target.maybe_readable_identify(targets or self.partition)
 
   @memoized_method
   def junitxml_path(self, *targets):
     xml_path = os.path.join(self.root_dir, 'junitxml',
-                            'TEST-{}.xml'.format(Target.maybe_readable_identify(targets)))
+                            'TEST-{}.xml'.format(self.target_set_id(*targets)))
     safe_mkdir_for(xml_path)
     return xml_path
 
@@ -67,11 +71,7 @@ class _Workdirs(datatype('_Workdirs', ['root_dir'])):
     return list(files_iter())
 
 
-class PytestResult(object):
-  @staticmethod
-  def exception():
-    return PytestResult('EXCEPTION')
-
+class PytestResult(TestResult):
   _SUCCESS_EXIT_CODES = (
     0,
 
@@ -85,48 +85,6 @@ class PytestResult(object):
   @classmethod
   def _map_exit_code(cls, value):
     return 0 if value in cls._SUCCESS_EXIT_CODES else value
-
-  @classmethod
-  def rc(cls, value):
-    exit_code = cls._map_exit_code(value)
-    return PytestResult('SUCCESS' if exit_code == 0 else 'FAILURE', rc=exit_code)
-
-  @classmethod
-  def from_error(cls, error):
-    if not isinstance(error, TaskError):
-      raise AssertionError('Can only synthesize a {} from a TaskError, given a {}'
-                           .format(cls.__name__, type(error).__name__))
-    return cls.rc(error.exit_code).with_failed_targets(error.failed_targets)
-
-  def with_failed_targets(self, failed_targets):
-    return PytestResult(self._msg, self._rc, failed_targets)
-
-  def __init__(self, msg, rc=None, failed_targets=None):
-    self._rc = rc
-    self._msg = msg
-    self._failed_targets = failed_targets or []
-
-  def __str__(self):
-    return self._msg
-
-  @property
-  def success(self):
-    return self._rc == 0
-
-  @property
-  def failed_targets(self):
-    return self._failed_targets
-
-  def checked(self):
-    """Raise if this result was unsuccessful and otherwise return this result unchanged.
-
-    :returns: this instance if successful
-    :rtype: :class:`PytestResult`
-    :raises: :class:`ErrorWhileTesting` if this result represents a failure
-    """
-    if not self.success:
-      raise ErrorWhileTesting(exit_code=self._rc, failed_targets=self._failed_targets)
-    return self
 
 
 class PytestRun(TestRunnerTaskMixin, Task):
@@ -543,20 +501,19 @@ class PytestRun(TestRunnerTaskMixin, Task):
     file_info = test_info['file']
     return relsrc_to_target.get(file_info)
 
-  def _partition(self, targets):
+  def _iter_partitions(self, targets):
     # TODO(John Sirois): Consume `py.test` pexes matched to the partitioning in effect after
     # https://github.com/pantsbuild/pants/pull/4638 lands.
     if self.get_options().fast:
-      return tuple(targets),
+      yield tuple(targets)
     else:
-      return tuple((target,) for target in targets)
+      for target in targets:
+        yield (target,)
 
   def _run_tests(self, targets):
-    partitions = self._partition(targets)
-
     results = {}
     failure = False
-    for partition in partitions:
+    for partition in self._iter_partitions(targets):
       try:
         rv = self._do_run_tests(partition)
       except ErrorWhileTesting as e:
@@ -572,7 +529,7 @@ class PytestRun(TestRunnerTaskMixin, Task):
       if len(partition) == 1 or rv.success:
         log = self.context.log.info if rv.success else self.context.log.error
         for target in partition:
-          log('{0:80}.....{1:>10}'.format(target.id, rv))
+          log('{0:80}.....{1:>10}'.format(target.address.reference(), rv))
       else:
         # There is not much useful we can display in summary for a multi-target partition with
         # failures without parsing those failures to link them to individual targets; ie: targets
@@ -665,16 +622,14 @@ class PytestRun(TestRunnerTaskMixin, Task):
       # 1.) output -> workdir
       # 2.) [iff all == invalid] workdir -> cache: We do this manually for now.
       # 3.) [iff invalid == 0 and all > 0] cache -> workdir: Done transparently by `invalidated`.
-      # 4.) [iff user-specified final locations] workdir -> final-locations: We perform this step
-      #     as an unconditional post-process.
 
       # 1.) Write all results that will be potentially cached to workdir.
-      workdirs = _Workdirs.for_targets(self.workdir, partition)
-      result = self._run_pytest(workdirs, invalid_tgts).checked()
+      workdirs = _Workdirs.for_partition(self.workdir, partition)
+      result = self._run_pytest_checked(workdirs, invalid_tgts)
 
       cache_vts = self._vts_for_partition(invalidation_check)
       if invalidation_check.all_vts == invalidation_check.invalid_vts:
-        # 2.) The full partition was invalid, cache results.
+        # 2.) The full partition was invalid, cache successful test results.
         if result.success and self.artifact_cache_writes_enabled():
           self.update_artifact_cache([(cache_vts, workdirs.files())])
       elif not invalidation_check.invalid_vts:
@@ -691,31 +646,37 @@ class PytestRun(TestRunnerTaskMixin, Task):
         # cache the results. That 1st of others is hopefully CI!
         cache_vts.force_invalidate()
 
-      # 4.) Pluck any results that an end user might need to interact with from the workdir to the
-      # locations they expect.
-      self.expose_results(invalid_tgts, partition, workdirs)
-
       return result
 
-  def expose_results(self, invalid_tgts, partition, workdirs):
+  def _expose_results(self, invalid_tgts, workdirs):
     external_junit_xml_dir = self.get_options().junit_xml_dir
     if external_junit_xml_dir:
       # Either we just ran pytest for a set of invalid targets and generated a junit xml file
       # specific to that (sub)set or else we hit the cache for the whole partition and skipped
       # running pytest, simply retrieving the partition's full junit xml file.
-      junitxml_path = workdirs.junitxml_path(*(invalid_tgts or partition))
+      junitxml_path = workdirs.junitxml_path(*invalid_tgts)
 
       safe_mkdir(external_junit_xml_dir)
       shutil.copy2(junitxml_path, external_junit_xml_dir)
+
     if self.get_options().coverage:
       coverage_output_dir = self.get_options().coverage_output_dir
       if coverage_output_dir:
         target_dir = coverage_output_dir
       else:
-        relpath = Target.maybe_readable_identify(partition)
         pants_distdir = self.context.options.for_global_scope().pants_distdir
+        relpath = workdirs.target_set_id()
         target_dir = os.path.join(pants_distdir, 'coverage', relpath)
       mergetree(workdirs.coverage_path, target_dir)
+
+  def _run_pytest_checked(self, workdirs, targets):
+    result = self._run_pytest(workdirs, targets)
+
+    # Unconditionally pluck any results that an end user might need to interact with from the
+    # workdir to the locations they expect.
+    self._expose_results(targets, workdirs)
+
+    return result.checked()
 
   def _run_pytest(self, workdirs, targets):
     if not targets:

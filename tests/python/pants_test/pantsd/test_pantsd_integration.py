@@ -18,6 +18,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 from pants.pantsd.process_manager import ProcessManager
 from pants.util.collections import combined_dict
+from pants.util.contextutil import temporary_dir
 from pants.util.dirutil import touch
 from pants_test.pants_run_integration_test import PantsRunIntegrationTest
 from pants_test.testutils.process_test_util import assert_no_process_exists_by_command
@@ -244,6 +245,49 @@ class TestPantsDaemonIntegration(PantsRunIntegrationTest):
         pantsd_run(cmd[1:], {'GLOBAL': {'level': cmd[0]}})
         checker.assert_running()
 
+  def test_pantsd_lifecycle_non_invalidation(self):
+    with self.pantsd_successful_run_context() as (pantsd_run, checker, _):
+      variants = (
+        ['-q', 'help'],
+        ['--no-colors', 'help'],
+        ['help']
+      )
+      last_pid = None
+      for cmd in itertools.chain(*itertools.repeat(variants, 3)):
+        # Run with a CLI flag.
+        pantsd_run(cmd)
+        next_pid = checker.await_pantsd()
+        if last_pid is not None:
+          self.assertEqual(last_pid, next_pid)
+        last_pid = next_pid
+
+  def test_pantsd_lifecycle_non_invalidation_on_config_string(self):
+    with temporary_dir() as dist_dir_root, temporary_dir() as config_dir:
+      config_files = [
+        os.path.abspath(os.path.join(config_dir, 'pants.ini.{}'.format(i))) for i in range(2)
+      ]
+      for config_file in config_files:
+        print('writing {}'.format(config_file))
+        with open(config_file, 'wb') as fh:
+          fh.write('[GLOBAL]\npants_distdir: {}\n'.format(os.path.join(dist_dir_root, 'v1')))
+
+      invalidating_config = os.path.join(config_dir, 'pants.ini.invalidates')
+      with open(invalidating_config, 'wb') as fh:
+        fh.write('[GLOBAL]\npants_distdir: {}\n'.format(os.path.join(dist_dir_root, 'v2')))
+
+      with self.pantsd_successful_run_context() as (pantsd_run, checker, _):
+        variants = [['--pants-config-files={}'.format(f), 'help'] for f in config_files]
+        pantsd_pid = None
+        for cmd in itertools.chain(*itertools.repeat(variants, 2)):
+          pantsd_run(cmd)
+          if not pantsd_pid:
+            pantsd_pid = checker.await_pantsd()
+          else:
+            checker.assert_running()
+
+        pantsd_run(['--pants-config-files={}'.format(invalidating_config), 'help'])
+        self.assertNotEqual(pantsd_pid, checker.await_pantsd())
+
   def test_pantsd_stray_runners(self):
     # Allow env var overrides for local stress testing.
     attempts = int(os.environ.get('PANTS_TEST_PANTSD_STRESS_ATTEMPTS', 20))
@@ -275,9 +319,9 @@ class TestPantsDaemonIntegration(PantsRunIntegrationTest):
       daemon_runs = [pantsd_run(cmd) for cmd in cmds]
       checker.await_pantsd()
 
-    for run in daemon_runs:
-      self.assertEqual(run.stderr_data.strip(), '')
-      self.assertNotEqual(run.stdout_data, '')
+    for cmd, run in zip(cmds, daemon_runs):
+      self.assertEqual(run.stderr_data.strip(), '', 'Non-empty stderr for {}'.format(cmd))
+      self.assertNotEqual(run.stdout_data, '', 'Empty stdout for {}'.format(cmd))
 
     for run_pairs in zip(non_daemon_runs, daemon_runs):
       self.assertEqual(*(run.stdout_data for run in run_pairs))

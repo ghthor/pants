@@ -112,7 +112,7 @@ the release manager may also need to do a release from a stable branch.*
      * Create a new page() in `src/python/pants/notes/BUILD` corresponding to the new notes. <br/>
    For additional information on generating documentation see the
    [docs reference](http://www.pantsbuild.org/docs#generating-the-site)
-4. Bring the CONTRIBUTORS roster (from master) in
+4. Bring the CONTRIBUTORS roster in
    [CONTRIBUTORS.md](https://github.com/pantsbuild/pants/tree/master/CONTRIBUTORS.md)
    up to date by running `build-support/bin/contributors.sh`.
 5. Create and land a review for changes in the master branch.
@@ -229,8 +229,12 @@ Right now that's:
 - pantsbuild.pants.contrib.scalajs
 - pantsbuild.pants.contrib.findbugs
 - pantsbuild.pants.contrib.cpp
+- pantsbuild.pants.contrib.confluence
 - pantsbuild.pants.contrib.errorprone
+- pantsbuild.pants.contrib.codeanalysis
 - pantsbuild.pants.contrib.jax_ws
+- pantsbuild.pants.contrib.mypy
+- pantsbuild.pants.contrib.avro
 
 You can run the following to get a full ownership roster for each
 package :

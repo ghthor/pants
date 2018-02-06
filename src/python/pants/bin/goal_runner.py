@@ -90,7 +90,7 @@ class GoalRunnerFactory(object):
     :param list target_specs: The original target specs.
     :param LegacyGraphHelper graph_helper: A LegacyGraphHelper to use for graph construction,
                                            if available. This would usually come from the daemon.
-    :returns: A tuple of (BuildGraph, AddressMapper, spec_roots).
+    :returns: A tuple of (BuildGraph, AddressMapper, opt Scheduler, spec_roots).
     """
     # N.B. Use of the daemon implies use of the v2 engine.
     if graph_helper or use_engine:
@@ -101,6 +101,7 @@ class GoalRunnerFactory(object):
         graph_helper = EngineInitializer.setup_legacy_graph(
           pants_ignore_patterns,
           workdir,
+          self._global_options.build_file_imports,
           native=native,
           build_file_aliases=self._build_config.registered_aliases(),
           build_ignore_patterns=build_ignore_patterns,
@@ -113,7 +114,7 @@ class GoalRunnerFactory(object):
                                         build_root=self._root_dir,
                                         change_calculator=graph_helper.change_calculator)
       graph, address_mapper = graph_helper.create_build_graph(target_roots, self._root_dir)
-      return graph, address_mapper, target_roots.as_specs()
+      return graph, address_mapper, graph_helper.scheduler, target_roots.as_specs()
     else:
       spec_roots = TargetRoots.parse_specs(target_specs, self._root_dir)
       address_mapper = BuildFileAddressMapper(self._build_file_parser,
@@ -121,7 +122,7 @@ class GoalRunnerFactory(object):
                                               build_ignore_patterns,
                                               exclude_target_regexps,
                                               subproject_build_roots)
-      return MutableBuildGraph(address_mapper), address_mapper, spec_roots
+      return MutableBuildGraph(address_mapper), address_mapper, None, spec_roots
 
   def _determine_goals(self, requested_goals):
     """Check and populate the requested goals for a given run."""
@@ -151,13 +152,6 @@ class GoalRunnerFactory(object):
 
     return list(generate_targets(specs))
 
-  def _maybe_launch_pantsd(self, pantsd_launcher):
-    """Launches pantsd if configured to do so."""
-    if self._global_options.enable_pantsd:
-      # Avoid runtracker output if pantsd is disabled. Otherwise, show up to inform the user its on.
-      with self._run_tracker.new_workunit(name='pantsd', labels=[WorkUnitLabel.SETUP]):
-        pantsd_launcher.maybe_launch()
-
   def _should_be_quiet(self, goals):
     if self._explain:
       return True
@@ -169,7 +163,7 @@ class GoalRunnerFactory(object):
 
   def _setup_context(self):
     with self._run_tracker.new_workunit(name='setup', labels=[WorkUnitLabel.SETUP]):
-      self._build_graph, self._address_mapper, spec_roots = self._init_graph(
+      self._build_graph, self._address_mapper, scheduler, spec_roots = self._init_graph(
         self._global_options.enable_v2_engine,
         self._global_options.pants_ignore,
         self._global_options.build_ignore,
@@ -200,7 +194,8 @@ class GoalRunnerFactory(object):
                         build_graph=self._build_graph,
                         build_file_parser=self._build_file_parser,
                         address_mapper=self._address_mapper,
-                        invalidation_report=invalidation_report)
+                        invalidation_report=invalidation_report,
+                        scheduler=scheduler)
       return goals, context
 
   def setup(self):
@@ -270,6 +265,7 @@ class GoalRunner(object):
 
     try:
       result = self._execute_engine()
+      self._context.set_resulting_graph_size_in_runtracker()
       if result:
         self._run_tracker.set_root_outcome(WorkUnit.FAILURE)
     except KeyboardInterrupt:
